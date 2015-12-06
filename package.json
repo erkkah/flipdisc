@@ -1,0 +1,20 @@
+{
+  "name": "flipdisc",
+  "version": "1.0.0",
+  "description": "Flip disc display experiments",
+  "main": "test.js",
+  "dependencies": {
+    "layout-bmfont-text": "^1.3.2",
+    "mono-bitmap": "^0.0.2",
+    "serialport": "^2.0.5",
+    "three": "^0.73.0",
+    "three-software-renderer": "^1.1.0",
+    "three.js": "^0.73.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Erik Agsjö",
+  "license": "ISC"
+}
