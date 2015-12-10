@@ -59,8 +59,16 @@ Display.prototype.drawPanel = function(panelIndex, data, callback){
 	serial.write(buffer, function(error){
 		if(error){
 			console.log('drawPanel: failed to send panel data')
+			return callback(error);
 		}
-		serial.drain(callback);
+		serial.drain(function(error){
+			if(error){
+				return(callback(error));
+			}
+			else {
+				return(callback(null, panelIndex));
+			}
+		});
 	});
 }
 
@@ -71,8 +79,20 @@ Display.prototype.clear = function(color, callback) {
 	var buffer = new Buffer(28);
 	buffer.fill(color ? 0x7F : 0);
 	var numPanels = this.panelLayout.width * this.panelLayout.height;
+	var panelsDrawn = 0;
+
 	for (var i = 0; i < numPanels; i++) {
-		this.drawPanel(i, buffer, callback);
+		this.drawPanel(i, buffer, function(error, result){
+			if(error){
+				return callback(error);
+			}
+			else {
+				panelsDrawn++;
+				if(panelsDrawn == numPanels){
+					callback(null);
+				}
+			}
+		});
 	}
 }
 
@@ -92,6 +112,9 @@ Display.prototype.drawBitmap = function(bitmap, callback) {
 	var bitmapHeight = panelHeight * 7;
 
 	assert(bitmap.length == bitmapWidth * bitmapHeight);
+
+	var numPanels = panelWidth * panelHeight;
+	var panelsDrawn = 0;
 
 	// Loop over all panels, drawing one at a time
 	for (var panelRow = 0; panelRow < panelHeight; panelRow++){
@@ -126,7 +149,17 @@ Display.prototype.drawBitmap = function(bitmap, callback) {
 				buffer[x] = pixel;
 			}
 
-			this.drawPanel(panelIndex, buffer, callback);
+			this.drawPanel(panelIndex, buffer, function(error, result){
+				if(error){
+					return callback(error);
+				}
+				else if(callback){
+					panelsDrawn++;
+					if(panelsDrawn == numPanels){
+						return callback(null);
+					}
+				}
+			});
 		}
 	}	
 }
