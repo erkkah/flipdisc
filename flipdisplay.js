@@ -1,21 +1,37 @@
-//
-// Flip Disc Display controller
-//
-
+"use strict"
 var assert = require('assert');
 var SerialPort = require('serialport').SerialPort;
 
 /**
-	Communication layer for an Alfa Zeta flip disc display, built up from XY-panels
-	connected to a serial interface. The physical panels are 28x14 dots, built up from
-	two	28x7 dot sub-panels with separate controllers. The controllers are connected
-	to a RS485 bus and are individually addressable.
-
-	Only rectangular configurations are supported, with controller addresses
-	starting at 0 and increasing in row first order.
-
-	A single panel display in landscape mode has a panelLayout parameter of width 1 and height 2.
-*/
+ * Communication layer for an Alfa Zeta flip disc display, built up from XY-panels
+ * connected to a serial interface. The physical panels are 28x14 dots, built up from
+ * two	28x7 dot sub-panels with separate controllers. The controllers are connected
+ * to a RS485 bus and are individually addressable.
+ *
+ * Only rectangular configurations are supported, with controller addresses
+ * starting at 0 and increasing in row first order.
+ *
+ * A single panel display in landscape mode has a panelLayout parameter of width 1 and height 2.
+ *
+ * Default configuration:
+ * ```
+ * {
+ *   "device": "/dev/ttyAMA0",
+ *   "baudRate": 57600,
+ *   "panelLayout": {
+ *     "orientation": "landscape",
+ *     "width": 1,
+ *     "height": 2
+ *   }
+ * }
+ * ```
+ * @example
+ * var FlipFlop = require('flipdisplay');
+ * var display = new FlipFlop();
+ *
+ * @constructor
+ * @param {map} params - Configuration parameters [optional]
+ */
 function Display(params) {
 	this.device = '/dev/ttyAMA0';
 	this.baudRate = 57600;
@@ -43,11 +59,16 @@ function Display(params) {
 }
 exports.Display = Display;
 
-// callback(error)
+/**
+ * Opens display by opening the serial port.
+ *
+ * @param {function} callback - Called on error or completion
+ */
 Display.prototype.open = function(callback){
 	this.port.open(callback);
 }
 
+// internal
 Display.prototype.drawPanel = function(panelIndex, data, callback){
 	var header = new Buffer([0x80]);
 	var command = new Buffer([0x83]);
@@ -73,8 +94,13 @@ Display.prototype.drawPanel = function(panelIndex, data, callback){
 }
 
 /**
-	Clears the display in color or black.
-*/
+ * Clears the display in color or black.
+ * Sets all dots to the colored side if @param{color} is non zero,
+ * or the black side otherwise.
+ *
+ * @param {byte} color - Non-zero means "color"
+ * @param {function} callback - Called on error or completion
+ */
 Display.prototype.clear = function(color, callback) {
 	var buffer = new Buffer(28);
 	buffer.fill(color ? 0x7F : 0);
@@ -97,9 +123,13 @@ Display.prototype.clear = function(color, callback) {
 }
 
 /**
-	Draws a full monochrome (1 byte per pixel) bitmap in row-first order.
-	Bitmap must be of full display size, covering all panels.
-*/
+ * Draws a full monochrome (1 byte per pixel) bitmap in row-first order.
+ * Bitmap must be of full display size, covering all panels.
+ *
+ * @param {array} bitmap - Array of panelwidth * panelheight elements,
+ * non-zero elements yields a set dot.
+ * @param {function} callback - Called on error or completion.
+ */
 Display.prototype.drawBitmap = function(bitmap, callback) {
 	if(this.panelLayout.orientation != 'landscape'){
 		throw new Error('unsupported panel orientation');
