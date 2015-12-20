@@ -1,5 +1,85 @@
+<!DOCTYPE html>
 <html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>FlipDisc controller</title>
+
+	<script src="https://code.jquery.com/jquery-1.11.3.js"></script>
+
+	<link rel="stylesheet" href="uikit/css/uikit.gradient.css" />
+	<script src="uikit/js/uikit.js"></script>
+
+	<link rel="stylesheet" href="uikit/css/components/sortable.gradient.css" />
+	<script src="uikit/js/components/sortable.js"></script>
+</head>
 <body>
-<h3>HååTree</h3>
+	<nav class="uk-navbar">
+		<a href="" class="uk-navbar-brand">FlipDisc</a>
+		<ul class="uk-navbar-nav" data-uk-switcher="{connect:'#display_views'}">
+			<li><a href=""><i class="uk-icon-tv"></i> Live</a></li>
+			<li><a href=""><i class="uk-icon-files-o"></i> Scripts</a></li>
+			<li><a href=""><i class="uk-icon-cogs"></i> Setup</a></li>
+		</ul>
+	</nav>
+	<div data-uk-observe class="uk-container uk-container-center uk-margin-top uk-margin-large-bottom">
+		<div>
+			<ul id="display_views" class="uk-switcher uk-margin">
+				<li>
+					<!-- Live -->
+					<div class="uk-grid">
+						<liveview class="uk-width-1-1"></liveview>
+					</div>
+					<div class="uk-grid">
+						<modeselector class="uk-width-1-1"></modeselector>
+					</div>
+				</li>
+				<li>
+					<!-- Scripts -->
+					<ul class="uk-tab" data-uk-tab="{connect:'#script-tabs'}">
+						<li class="uk-active"><a href="">Mode scripts</a></li>
+						<li><a href="">Display scripts</a></li>
+						<li><a href="">Data scripts</a></li>
+					</ul>
+
+					<ul class="uk-switcher uk-margin uk-height-1-1" id="script-tabs">
+						<li><modeeditor></modeeditor></li>
+						<li>
+							Massa intressant text som inte kommer klippas bort
+							<div style="height: 50em; padding:1px;" id="editor">
+							</div>
+						</li>
+						<li>qwe</li>
+					</ul>
+				</li>
+				<li>
+					<!-- Setup -->
+					<div class="uk-panel uk-panel-box uk-panel-box-primary ">
+						<h3 class="uk-panel-title">Setup!</h3>
+						Setting everything up, one bit at a time...
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/riot/2.3/riot+compiler.min.js"></script>
+	<script src="liveview.js" type="riot/tag"></script>
+	<script src="modeselector.js" type="riot/tag"></script>
+	<script src="modeeditor.js" type="riot/tag"></script>
+	<script>
+		riot.mount('liveview');
+		riot.mount('modeselector');
+		riot.mount('modeeditor');
+	</script>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.2/ace.js"/></script>
+	<script>
+		var editor = ace.edit("editor");
+		editor.getSession().setMode("ace/mode/json");
+		editor.setValue("Lots of cool text");
+		editor.resize()
+	</script>
 </body>
 </html>
