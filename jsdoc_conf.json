@@ -1,7 +1,16 @@
+
 {
+	"source": {
+		"include": ["./main.js", "./lib"]
+	},
 	"plugins": ["plugins/markdown"],
 	"markdown": {
 		"tags": [],
 		"excludeTags": []
+	},
+	"opts": {
+		"recurse": true,
+		"readme": "./README.md"
 	}
 }
+
