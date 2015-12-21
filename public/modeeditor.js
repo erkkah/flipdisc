@@ -5,7 +5,7 @@
 				<legend>Display Modes</legend>
 				<div class="uk-form-row">
 					<select size=4 class="uk-form-width-medium" onchange="{onChange}">
-						<option each={modes} selected={id == parent.selected}>{id}</option>
+						<option each={modes} selected={_id == parent.selectedId}>{name}</option>
 					</select>
 					<div class="uk-button-group">
 						<button class="uk-button uk-button-small" onclick="{onEdit}"><i class="uk-icon-edit"></i></button>
@@ -19,7 +19,7 @@
 			</form>
 			<div class="uk-width-1-2">
 				<div class="uk-alert">
-					<h3>Mode: {selected}</h3>
+					<h3>Mode: {selectedName}</h3>
 					{selectedDescription}
 				</div>
 			</div>
@@ -28,67 +28,82 @@
 
 	<modedetails></modedetails>
 
-	this.modes = [
-		{
-			"id": "black",
-			"description": "Just.. black"
-		},
-		{
-			"id": "visitor",
-			"description": "Safe for visitors"
-		},
-		{
-			"id": "company",
-			"description": "Internal - not safe for visitors"
-		}
-	]
+	var socket = opts;
+	var self = this;
 
-	this.selectedIndex = 1
-	this.selected = "visitor"
-	this.selectedDescription = "tjolahopp"
+	socket.on('modeschanged', function(modes){
+		self.modes = modes;
+		self.update();
+	});
+
+	this.modes = []
+
+	this.selectedId = undefined
+	this.selectedDescription = ""
 
 	this.on('update', function(){
 		for(var i in this.modes){
 			var mode = this.modes[i]
 
-			if(mode.id == this.selected){
-				this.selectedDescription = mode.description
-				this.selectedIndex = i
+			if(this.selectedId == undefined){
+				this.selectedId = mode._id;
+			}
+
+			if(mode._id == this.selectedId){
+				this.selectedName = mode.name;
+				this.selectedDescription = mode.description;
 				break
 			}
 		}
 	})
 
-	onEdit(event){
-		var self = this;
-		UIkit.modal.prompt("Rename mode", "hej", function(name){
+	findModeById(wantedId){
+		var matching = this.modes.reduce(function(previous, current){
+			if(current._id == wantedId){
+				return previous.concat(current);
+			}
+			else {
+				return previous;
+			}
+		}, []);
 
-		});
+		return matching.empty ? undefined : matching[0];
+	}
+
+	onEdit(event){
+		if(self.selectedId){
+			UIkit.modal.prompt("Rename mode", self.selectedName, function(newName){
+				var current = self.findModeById(self.selectedId);
+				current.name = newName;
+				socket.emit('setmode', current);
+			});
+		}
 	}
 
 	onDelete(event){
-		var self = this;
-		UIkit.modal.confirm("Delete mode?", function(){
-			if(self.selectedIndex != -1){
-				self.modes.splice(self.selectedIndex, 1)
-				self.update()
-			}
-		})
+		if(self.selectedId){
+			UIkit.modal.confirm("Delete mode '" + self.selectedName + "'?", function(){
+				socket.emit('deletemode', self.selectedId);
+			});
+		}
+		return false;
 	}
 
 	onAdd(event){
 		var newModeText = document.getElementById('newModeText')
 
-		this.modes.push({
-			"id": newModeText.value,
-			"description": ""
-		})
+		var newMode = {
+			"name": newModeText.value,
+			"description": "",
+			"scripts": []
+		};
+		socket.emit('setmode', newMode);
 
 		return false;
 	}
 
 	onChange(event){
-		this.selected = this.modes[event.target.selectedIndex].id
+		this.selectedId = this.modes[event.target.selectedIndex]._id
 		this.update()
 	}
 </modeeditor>

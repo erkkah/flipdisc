@@ -8,6 +8,7 @@ var socketio = require('socket.io');
 var diskdb = require('diskdb');
 
 var FlipDisplay = require('./lib/flipdisplay')
+var State = require('./lib/state')
 
 var config = ini.parse(fs.readFileSync(__dirname + '/flipdisc.ini', 'utf-8'));
 
@@ -18,8 +19,8 @@ var app = express();
 var server = http.Server(app);
 var io = socketio(server);
 var db = diskdb.connect(DBROOT);
-//db.loadCollections(['displayScripts'])
 
+var state = new State(db);
 var display = new FlipDisplay();
 
 display.open().then(function(){
@@ -30,8 +31,50 @@ display.open().then(function(){
 
 app.use(express.static(__dirname + '/public'));
 
+function updateClient(client){
+	client.emit('configchanged', state.getConfig());
+	client.emit('modeschanged', state.getModes());
+}
+
 io.on('connection', function(socket){
 	console.log('a user connected');
+
+	socket.on('refresh', function(){
+		console.log('Refreshing client');
+		updateClient(socket);
+	});
+
+	socket.on('setconfig', function(config){
+		console.log('Received config update');
+		state.setConfig(config);
+	});
+
+	socket.on('setmode', function(mode){
+		console.log('Received mode update:', mode);
+		state.setMode(mode);
+	});
+
+	socket.on('deletemode', function(modeId){
+		console.log('Received mode deletion');
+		state.deleteMode(
+			{
+				_id: modeId
+			}
+		);
+	});	
+
+	socket.on('error', function(error){
+		console.log(error);
+		socket.emit('notification', 'Server error: ' + error);
+	});
+});
+
+state.on('configchanged', function(config){
+	io.emit('configchanged', config);
+});
+
+state.on('modeschanged', function(modes){
+	io.emit('modeschanged', modes);
 });
 
 server.listen(PORT, function(){

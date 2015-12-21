@@ -13,6 +13,9 @@
 
 	<link rel="stylesheet" href="uikit/css/components/sortable.gradient.css" />
 	<script src="uikit/js/components/sortable.js"></script>
+
+	<link rel="stylesheet" href="uikit/css/components/notify.gradient.css" />
+	<script src="uikit/js/components/notify.js"></script>
 </head>
 <body>
 	<nav class="uk-navbar">
@@ -64,14 +67,19 @@
 		</div>
 	</div>
 
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+		var socket = io();
+	</script>
+
 	<script src="https://cdn.jsdelivr.net/riot/2.3/riot+compiler.min.js"></script>
 	<script src="liveview.js" type="riot/tag"></script>
 	<script src="modeselector.js" type="riot/tag"></script>
 	<script src="modeeditor.js" type="riot/tag"></script>
 	<script>
-		riot.mount('liveview');
-		riot.mount('modeselector');
-		riot.mount('modeeditor');
+		riot.mount('liveview', socket);
+		riot.mount('modeselector', socket);
+		riot.mount('modeeditor', socket);
 	</script>
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.2/ace.js"/></script>
@@ -81,5 +89,14 @@
 		editor.setValue("Lots of cool text");
 		editor.resize()
 	</script>
+
+	<script>
+		socket.on('notification', function(message){
+			
+			UIkit.notify(message);
+		});
+		socket.emit('refresh');
+	</script>
+
 </body>
 </html>
