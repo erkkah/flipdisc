@@ -48,11 +48,7 @@
 
 					<ul class="uk-switcher uk-margin uk-height-1-1" id="script-tabs">
 						<li><modeeditor></modeeditor></li>
-						<li>
-							Massa intressant text som inte kommer klippas bort
-							<div style="height: 50em; padding:1px;" id="editor">
-							</div>
-						</li>
+						<li><scripteditor></scripteditor></li>
 						<li>qwe</li>
 					</ul>
 				</li>
@@ -72,27 +68,22 @@
 		var socket = io();
 	</script>
 
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.2/ace.js"/></script>
+
 	<script src="https://cdn.jsdelivr.net/riot/2.3/riot+compiler.min.js"></script>
 	<script src="liveview.js" type="riot/tag"></script>
 	<script src="modeselector.js" type="riot/tag"></script>
 	<script src="modeeditor.js" type="riot/tag"></script>
+	<script src="scripteditor.js" type="riot/tag"></script>
 	<script>
 		riot.mount('liveview', socket);
 		riot.mount('modeselector', socket);
 		riot.mount('modeeditor', socket);
-	</script>
-
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.2/ace.js"/></script>
-	<script>
-		var editor = ace.edit("editor");
-		editor.getSession().setMode("ace/mode/json");
-		editor.setValue("Lots of cool text");
-		editor.resize()
+		riot.mount('scripteditor', socket);
 	</script>
 
 	<script>
 		socket.on('notification', function(message){
-			
 			UIkit.notify(message);
 		});
 		socket.emit('refresh');

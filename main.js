@@ -34,6 +34,7 @@ app.use(express.static(__dirname + '/public'));
 function updateClient(client){
 	client.emit('configchanged', state.getConfig());
 	client.emit('modeschanged', state.getModes());
+	client.emit('scriptschanged', state.getDisplayScripts());
 }
 
 io.on('connection', function(socket){
@@ -49,9 +50,15 @@ io.on('connection', function(socket){
 		state.setConfig(config);
 	});
 
-	socket.on('setmode', function(mode){
+	socket.on('setmode', function(mode, callback){
 		console.log('Received mode update:', mode);
-		state.setMode(mode);
+		try{
+			state.setMode(mode);
+			callback(null);
+		}catch(e){
+			console.log(e.stack);
+			callback(e + "");
+		}
 	});
 
 	socket.on('deletemode', function(modeId){
@@ -61,7 +68,18 @@ io.on('connection', function(socket){
 				_id: modeId
 			}
 		);
-	});	
+	});
+
+	socket.on('setscript', function(script, callback){
+		console.log('Received script update:', script);
+		try{
+			state.setDisplayScript(script);
+			callback(null);
+		}catch(e){
+			console.log(e.stack);
+			callback(e + "");
+		}
+	});
 
 	socket.on('error', function(error){
 		console.log(error);
@@ -77,6 +95,11 @@ state.on('modeschanged', function(modes){
 	io.emit('modeschanged', modes);
 });
 
+state.on('scriptschanged', function(scripts){
+	io.emit('scriptschanged', scripts);
+});
+
 server.listen(PORT, function(){
 	console.log(`listening on *:${PORT}`);
 });
+
