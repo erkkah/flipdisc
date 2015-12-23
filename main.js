@@ -9,6 +9,8 @@ var diskdb = require('diskdb');
 
 var FlipDisplay = require('./lib/flipdisplay')
 var State = require('./lib/state')
+var DataFetcher = require('./lib/datafetcher')
+var Animator = require('./lib/animator')
 
 var config = ini.parse(fs.readFileSync(__dirname + '/flipdisc.ini', 'utf-8'));
 

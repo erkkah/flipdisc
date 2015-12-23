@@ -77,9 +77,7 @@
 	<script src="scripteditor.js" type="riot/tag"></script>
 	<script>
 		riot.compile(function() {
-			riot.mount('liveview', socket);
-			riot.mount('modeselector', socket);
-			riot.mount('modeeditor', socket);
+			riot.mount('liveview, modeselector, modeeditor', socket);
 			var scriptEditor = riot.mount('#dsp-scripteditor', {
 				"socket": socket,
 				"title": "Display scripts",
@@ -88,7 +86,8 @@
 					"set": "setscript",
 					"delete": "deletescript"
 				},
-				"info": "Display scripts write to the display."
+				"info": "Display scripts do all the dot flipping on the display. " + 
+					"Flip flop non stop."
 			});
 			var dataEditor = riot.mount('#data-scripteditor', {
 				"socket": socket,
@@ -98,7 +97,7 @@
 					"set": "setdatascript",
 					"delete": "deletedatascript"
 				},
-				"template": "var code = \{\}",
+				"template": "var code = {\n};",
 				"info": "Data scripts define the data that display scripts can use to update the display."
 			});
 
