@@ -75,7 +75,7 @@
 	onEdit(event){
 		if(self.selectedId){
 			UIkit.modal.prompt("Rename script", self.selectedName, function(newName){
-				var current = self.findModeById(self.selectedId);
+				var current = self.findScriptById(self.selectedId);
 				current.name = newName;
 				self.socket.emit('setscript', current, function(err){
 					if(err){
@@ -89,17 +89,21 @@
 	onDelete(event){
 		if(self.selectedId){
 			UIkit.modal.confirm("Delete script '" + self.selectedName + "'?", function(){
-				self.socket.emit('deletescript', self.selectedId);
+				self.socket.emit('deletescript', self.selectedId, function(err){
+					if(err){
+						UIkit.modal.alert('Failed to delete script:' + err);
+					}
+				});
 			});
 		}
 		return false;
 	}
 
 	onAdd(event){
-		var newModeText = document.getElementById('newScriptText')
+		var newScriptText = document.getElementById('newScriptText')
 
 		var newScript = {
-			name: newModeText.value,
+			name: newScriptText.value,
 			code: 'code = {\n' + 
 				'	onSetup: function(configuration, dataSource){\n' +
 				'		// set properties of this animation script\n' +
