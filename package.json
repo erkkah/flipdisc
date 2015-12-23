@@ -13,7 +13,9 @@
     "serialport": "^2.0.5",
     "socket.io": "^1.3.7"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "riot": "^2.3.12"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

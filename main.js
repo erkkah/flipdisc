@@ -35,6 +35,7 @@ function updateClient(client){
 	client.emit('configchanged', state.getConfig());
 	client.emit('modeschanged', state.getModes());
 	client.emit('scriptschanged', state.getDisplayScripts());
+	client.emit('datascriptschanged', state.getDataFetchers());
 }
 
 io.on('connection', function(socket){
@@ -61,11 +62,11 @@ io.on('connection', function(socket){
 		}
 	});
 
-	socket.on('deletemode', function(modeId){
+	socket.on('deletemode', function(modeID){
 		console.log('Received mode deletion');
 		state.deleteMode(
 			{
-				_id: modeId
+				_id: modeID
 			}
 		);
 	});
@@ -74,6 +75,47 @@ io.on('connection', function(socket){
 		console.log('Received script update:', script);
 		try{
 			state.setDisplayScript(script);
+			callback(null);
+		}catch(e){
+			console.log(e.stack);
+			callback(e + "");
+		}
+	});
+
+	socket.on('deletescript', function(scriptID, callback){
+		console.log('Received script deletion');
+		try{
+			state.deleteDisplayScript(
+				{
+					_id: scriptID
+				}
+			);
+			callback(null);
+		}catch(e){
+			console.log(e.stack);
+			callback(e + "");
+		}
+	});
+
+	socket.on('setdatascript', function(script, callback){
+		console.log('Received data script update:', script);
+		try{
+			state.setDataFetcher(script);
+			callback(null);
+		}catch(e){
+			console.log(e.stack);
+			callback(e + "");
+		}
+	});
+
+	socket.on('deletedatascript', function(scriptID, callback){
+		console.log('Received data script deletion');
+		try{
+			state.deleteDataFetcher(
+				{
+					_id: scriptID
+				}
+			);
 			callback(null);
 		}catch(e){
 			console.log(e.stack);
@@ -97,6 +139,10 @@ state.on('modeschanged', function(modes){
 
 state.on('scriptschanged', function(scripts){
 	io.emit('scriptschanged', scripts);
+});
+
+state.on('datafetcherschanged', function(scripts){
+	io.emit('datascriptschanged', scripts);
 });
 
 server.listen(PORT, function(){

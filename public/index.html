@@ -6,7 +6,7 @@
 
 	<title>FlipDisc controller</title>
 
-	<script src="https://code.jquery.com/jquery-1.11.3.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 
 	<link rel="stylesheet" href="uikit/css/uikit.gradient.css" />
 	<script src="uikit/js/uikit.js"></script>
@@ -48,8 +48,8 @@
 
 					<ul class="uk-switcher uk-margin uk-height-1-1" id="script-tabs">
 						<li><modeeditor></modeeditor></li>
-						<li><scripteditor></scripteditor></li>
-						<li>qwe</li>
+						<li><scripteditor id="dsp-scripteditor"></scripteditor></li>
+						<li><scripteditor id="data-scripteditor"></scripteditor></li>
 					</ul>
 				</li>
 				<li>
@@ -76,17 +76,45 @@
 	<script src="modeeditor.js" type="riot/tag"></script>
 	<script src="scripteditor.js" type="riot/tag"></script>
 	<script>
-		riot.mount('liveview', socket);
-		riot.mount('modeselector', socket);
-		riot.mount('modeeditor', socket);
-		riot.mount('scripteditor', socket);
+		riot.compile(function() {
+			riot.mount('liveview', socket);
+			riot.mount('modeselector', socket);
+			riot.mount('modeeditor', socket);
+			var scriptEditor = riot.mount('#dsp-scripteditor', {
+				"socket": socket,
+				"title": "Display scripts",
+				"events": {
+					"update": "scriptschanged",
+					"set": "setscript",
+					"delete": "deletescript"
+				},
+				"info": "Display scripts write to the display."
+			});
+			var dataEditor = riot.mount('#data-scripteditor', {
+				"socket": socket,
+				"title": "Data scripts",
+				"events": {
+					"update": "datascriptschanged",
+					"set": "setdatascript",
+					"delete": "deletedatascript"
+				},
+				"template": "var code = \{\}",
+				"info": "Data scripts define the data that display scripts can use to update the display."
+			});
+
+		});
 	</script>
 
 	<script>
 		socket.on('notification', function(message){
 			UIkit.notify(message);
 		});
-		socket.emit('refresh');
+
+		// Hacketi-hack. Letting things settle before requesting refresh.
+		setTimeout(function(){
+			socket.emit('refresh');
+		}, 100);
+		
 	</script>
 
 </body>

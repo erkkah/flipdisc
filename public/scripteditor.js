@@ -1,10 +1,10 @@
 <scripteditor>
 	<div class="uk-panel uk-panel-box uk-margin">
 		<div class="uk-grid uk-grid-match" data-uk-grid-match>
-			<form class="uk-form uk-form-stacked uk-width-1-2" id="scriptform">
-				<legend>Display Scripts</legend>
+			<form class="uk-form uk-form-stacked uk-width-1-2">
+				<legend>{opts.title}</legend>
 				<div class="uk-form-row">
-					<select size=4 class="uk-form-width-medium" id="scriptlist" onchange="{onChange}">
+					<select size=4 class="uk-form-width-medium" id="scriptlist" onchange="{onChange}" disabled={tags.scriptdetails.dirty}>
 						<option each={scripts} selected={_id == parent.selectedId}>{name}</option>
 					</select>
 					<div class="uk-button-group">
@@ -13,24 +13,24 @@
 					</div>
 				</div>
 				<div class="uk-form-row">
-					<input type="text" class="uk-form-width-medium" placeholder="New script" id="newScriptText">
+					<input type="text" class="uk-form-width-medium" placeholder="New script" id="newscripttext">
 					<button class="uk-button uk-button-small" onclick="{onAdd}"><i class="uk-icon-plus"></i></button>
 				</div>
 			</form>
 			<div class="uk-width-1-2">
-				<div class="uk-alert">
-					<h3>Script: {selectedName}</h3>
+				<div class="uk-panel uk-panel-box uk-panel-box-primary">
+					{opts.info}
 				</div>
 			</div>
 		</div>
 	</div>
 
-	<scriptdetails selected_id="{selectedId}"></scriptdetails>
+	<scriptdetails selected_id={selectedId} events={opts.events}></scriptdetails>
 
 	var self = this;
-	self.socket = opts;
+	self.socket = opts.socket;
 
-	self.socket.on('scriptschanged', function(scripts){
+	self.socket.on(opts.events.update, function(scripts){
 		self.scripts = scripts;
 		self.update();
 	});
@@ -52,11 +52,6 @@
 				break
 			}
 		}
-
-		var disabled = self.tags.scriptdetails.dirty;
-		scriptlist.disabled = disabled;
-		deletebutton.disabled = disabled;
-		editbutton.disabled = disabled;
 	})
 
 	findScriptById(wantedId){
@@ -77,7 +72,7 @@
 			UIkit.modal.prompt("Rename script", self.selectedName, function(newName){
 				var current = self.findScriptById(self.selectedId);
 				current.name = newName;
-				self.socket.emit('setscript', current, function(err){
+				self.socket.emit(opts.events.set, current, function(err){
 					if(err){
 						UIkit.modal.alert('Failed to rename script:' + err);
 					}
@@ -89,7 +84,7 @@
 	onDelete(event){
 		if(self.selectedId){
 			UIkit.modal.confirm("Delete script '" + self.selectedName + "'?", function(){
-				self.socket.emit('deletescript', self.selectedId, function(err){
+				self.socket.emit(opts.events.delete, self.selectedId, function(err){
 					if(err){
 						UIkit.modal.alert('Failed to delete script:' + err);
 					}
@@ -100,11 +95,10 @@
 	}
 
 	onAdd(event){
-		var newScriptText = document.getElementById('newScriptText')
-
+		var scriptName = $('#newscripttext', self.root).val();
 		var newScript = {
-			name: newScriptText.value,
-			code: 'code = {\n' + 
+			name: scriptName,
+			code: opts.template || 'code = {\n' + 
 				'	onSetup: function(configuration, dataSource){\n' +
 				'		// set properties of this animation script\n' +
  				'		// pull data from data source\n' +
@@ -120,7 +114,7 @@
 				'	 	}\n' +
 				'	};\n'
 		};
-		self.socket.emit('setscript', newScript, function(err){
+		self.socket.emit(opts.events.set, newScript, function(err){
 			if(err){
 				UIkit.modal.alert('Failed to create new script:', err);
 			}
@@ -132,8 +126,6 @@
 	onChange(event){
 		this.selectedId = this.scripts[event.target.selectedIndex]._id;
 		this.update();
-		// ??? Needed?
-		//this.tags.scriptdetails.update();
 	}
 </scripteditor>
 
@@ -143,7 +135,7 @@
 			<form class="uk-form uk-form-stacked uk-width-1-1">
 				<legend>{"Code" + (dirty ? " *": "")}</legend>
 				<div class="uk-form-row">
-					<div id="code-editor" style="height:300px;"></div>
+					<div id="code_editor" style="height:300px;"></div>
 				</div>
 				<div class="uk-form-row">
 					<div class="uk-float-right">
@@ -162,12 +154,12 @@
 
 	self.on('mount', function(){
 		try{
-			self.editor = ace.edit("code-editor");
+			var code_editor = $('#code_editor', self.root).get(0);
+			self.editor = ace.edit(code_editor);
 			self.editor.$blockScrolling = Infinity;
 			self.editor.getSession().setMode("ace/mode/javascript");
 			self.editor.getSession().on('change', function(e){
 				if(!self.blockDirtyNotifications){
-					console.log('Editor changed!', e)
 					self.dirty = true;
 					self.parent.update();
 				}
@@ -177,7 +169,7 @@
 		}
 	});
 	
-	self.socket.on('scriptschanged', function(newScripts){
+	self.socket.on(opts.events.update, function(newScripts){
 		if(self.dirty){
 			if(newScripts.find(function(script){
 				// Match currently edited script, if it differs
@@ -207,7 +199,7 @@
 	onSave(e){
 		if(self.dirty){
 			self.currentScript.code = self.editor.getValue();
-			self.socket.emit('setscript', self.currentScript, function(err, result){
+			self.socket.emit(opts.events.set, self.currentScript, function(err, result){
 				if(err){
 					UIkit.modal.alert('Failed to save script:' + err);
 				}

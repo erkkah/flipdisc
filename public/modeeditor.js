@@ -106,7 +106,11 @@
 			"description": "",
 			"scripts": []
 		};
-		self.socket.emit('setmode', newMode);
+		self.socket.emit('setmode', newMode, function(err){
+			if(err){
+				UIkit.modal.alert('Failed to add new mode: ' + err);
+			}
+		});
 
 		return false;
 	}
