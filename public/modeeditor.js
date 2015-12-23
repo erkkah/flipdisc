@@ -124,7 +124,7 @@
 				<legend>{"Mode configuration" + (dirty ? " *" : "")}</legend>
 				<div class="uk-form-row">
 					<label class="uk-form-label" for="form_desc">Description</label>
-					<input type="text" class="uk-width-1-1" placeholder="description" id="form_desc" value={description}>
+					<input type="text" class="uk-width-1-1" placeholder="description" id="form_desc" value={currentMode.description} onchange={onDescriptionChange}>
 				</div>
 				<div class="uk-form-row">
 					<label class="uk-form-label" for="form_mode_config">Display scripts</label>
@@ -221,17 +221,29 @@
 	self.on('update', function(){
 		if(!self.dirty){
 			self.draggableOrder = 0;
-			self.currentScripts = [];		
+			self.currentScripts = [];
 			var current = self.parent.findModeById(opts.selected_id);
 			if(current){
 				self.currentMode = Object.assign({}, current);
-				self.currentScripts = self.currentMode.scripts;
+				// Get name from list of all scripts
+				self.currentScripts = self.currentMode.scripts.map(function(scriptReference){
+					var script = self.allScripts.find(function(el){
+						return (el._id == scriptReference.scriptID);
+					});
+					scriptReference.name = script.name;
+					return scriptReference;
+				});
 			}
 		}
 	})
 
+	onDescriptionChange(e){
+		self.dirty = true;
+		self.parent.update();
+	}
+
 	onEditConfig(e){
-		self.editedItem = e.item;
+		self.editedItem = e.item.script;
 		self.configEditor.setValue(self.editedItem.config, -1);
 		return false;
 	}
@@ -258,15 +270,11 @@
 	}
 
 	onDelete(e){
-		var script = e.item;
-
-		var index = self.currentScripts.findIndex(function(s){
-			return s._id == script._id;
-		})
-
-		self.currentScripts = self.currentScripts.splice(index, 1);
+		self.currentScripts.splice(e.item.index, 1);
 		self.dirty = true;
 		self.parent.update();
+
+		return false;
 	}
 
 	onRevert(){
@@ -276,6 +284,7 @@
 	}
 
 	onSave(){
+		self.currentMode.description = form_desc.value;
 		self.currentMode.scripts = self.currentScripts;
 		self.socket.emit('setmode', self.currentMode, function(err){
 			if(err){
