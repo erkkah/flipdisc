@@ -56,7 +56,7 @@
 					<!-- Setup -->
 					<div class="uk-panel uk-panel-box uk-panel-box-primary ">
 						<h3 class="uk-panel-title">Setup!</h3>
-						Setting everything up, one bit at a time...
+						Nothing to see here. Go to server and edit the "flipdisc.ini" file.
 					</div>
 				</li>
 			</ul>
@@ -87,7 +87,11 @@
 					"delete": "deletescript"
 				},
 				"info": "Display scripts do all the dot flipping on the display. " + 
-					"Flip flop non stop."
+					"Flip flop non stop. " +
+					"All scripts must define a variable 'code' holding the class that is called to draw. " +
+					"The class must define 'onSetup(configuration, dataSource)' and " +
+					"'onFrame(oldFrame, timePassedInSeconds, frameCallback)' methods. " +
+					"The frameCallback is called with (updatedFrame, milliSecondsToNextFrame)."
 			});
 			var dataEditor = riot.mount('#data-scripteditor', {
 				"socket": socket,

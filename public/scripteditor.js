@@ -111,8 +111,8 @@
 				'		// Providing no callback time ends the script.\n' +
 				'		//\n' +
 				'		// frameCallback(updatedFrame, 1000);\n' +
-				'	 	}\n' +
-				'	};\n'
+				' 	}\n' +
+				'};\n'
 		};
 		self.socket.emit(opts.events.set, newScript, function(err){
 			if(err){
