@@ -98,7 +98,9 @@
 					"delete": "deletedatascript"
 				},
 				"template": "var code = {\n};",
-				"info": "Data scripts define the data that display scripts can use to update the display."
+				"info": "Data scripts define the data that display scripts can use to update the display. " +
+				"All scripts must define a variable 'code' holding the class that is called to generate data. " +
+				"The class must define a method 'onUpdate' that returns the updated data."
 			});
 
 		});

@@ -9,8 +9,7 @@ var diskdb = require('diskdb');
 
 var FlipDisplay = require('./lib/flipdisplay')
 var State = require('./lib/state')
-var DataFetcher = require('./lib/datafetcher')
-var Animator = require('./lib/animator')
+var Controller = require('./lib/controller')
 
 var config = ini.parse(fs.readFileSync(__dirname + '/flipdisc.ini', 'utf-8'));
 
@@ -31,6 +30,8 @@ display.open().then(function(){
 	console.log("failed to init display:", err)
 })
 
+var controller = new Controller(state, display);
+
 app.use(express.static(__dirname + '/public'));
 
 function updateClient(client){
@@ -38,10 +39,10 @@ function updateClient(client){
 	client.emit('modeschanged', state.getModes());
 	client.emit('scriptschanged', state.getDisplayScripts());
 	client.emit('datascriptschanged', state.getDataFetchers());
+	client.emit('statuschanged', controller.getStatus());
 }
 
 io.on('connection', function(socket){
-	console.log('a user connected');
 
 	socket.on('refresh', function(){
 		console.log('Refreshing client');
@@ -145,6 +146,10 @@ state.on('scriptschanged', function(scripts){
 
 state.on('datafetcherschanged', function(scripts){
 	io.emit('datascriptschanged', scripts);
+});
+
+controller.on('statuschanged', function(status){
+	io.emit('statuschanged', status);
 });
 
 server.listen(PORT, function(){
