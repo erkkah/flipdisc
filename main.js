@@ -27,10 +27,15 @@ var display = new FlipDisplay();
 var displayStatus = "Not initialized";
 display.open().then(function(){
 	displayStatus = "Opened";
+	display.clear(0, function(error){
+		console.log("Done clearing, ", error);
+	})
 }).catch(function(err){
 	console.log("failed to init display:", err);
 	displayStatus = err + "";
 })
+
+
 
 var controller = new Controller(state, display);
 
