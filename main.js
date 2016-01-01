@@ -24,24 +24,27 @@ var db = diskdb.connect(DBROOT);
 var state = new State(db);
 var display = new FlipDisplay();
 
+var controller = null;
+
 var displayStatus = "Not initialized";
 display.open().then(function(){
 	displayStatus = "Opened";
 	display.clear(0, function(error){
 		console.log("Done clearing, ", error);
 	})
+	controller = new Controller(state, display);
+	controller.on('statuschanged', function(status){
+		io.emit('statuschanged', getDisplayStatus());
+	});
 }).catch(function(err){
 	console.log("failed to init display:", err);
 	displayStatus = err + "";
 })
 
-
-
-var controller = new Controller(state, display);
-
 app.use(express.static(__dirname + '/public'));
 
-function addDisplayStatus(controllerStatus){
+function getDisplayStatus(){
+	var controllerStatus = controller ? controller.getStatus() : {};
 	controllerStatus.display = displayStatus;
 	return controllerStatus;
 }
@@ -51,7 +54,7 @@ function updateClient(client){
 	client.emit('modeschanged', state.getModes());
 	client.emit('scriptschanged', state.getDisplayScripts());
 	client.emit('datascriptschanged', state.getDataFetchers());
-	client.emit('statuschanged', addDisplayStatus(controller.getStatus()));
+	client.emit('statuschanged', getDisplayStatus());
 }
 
 io.on('connection', function(socket){
@@ -158,10 +161,6 @@ state.on('scriptschanged', function(scripts){
 
 state.on('datafetcherschanged', function(scripts){
 	io.emit('datascriptschanged', scripts);
-});
-
-controller.on('statuschanged', function(status){
-	io.emit('statuschanged', addDisplayStatus(status));
 });
 
 server.listen(PORT, function(){

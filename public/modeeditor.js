@@ -18,9 +18,8 @@
 				</div>
 			</form>
 			<div class="uk-width-1-2">
-				<div class="uk-alert">
-					<h3>Mode: {selectedName}</h3>
-					{selectedDescription}
+				<div class="uk-panel uk-panel-box uk-panel-box-primary">
+					<yield/>
 				</div>
 			</div>
 		</div>
