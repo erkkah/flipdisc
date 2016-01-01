@@ -159,6 +159,23 @@
 			UIkit.notify(message);
 		});
 
+		socket.on('error', function(error){
+			UIkit.notify('Connection problem' + error, {status: 'warning'});
+		});
+
+		socket.on('reconnecting', function(attempt){
+			UIkit.notify('Reconnecting...' + attempt, {status: 'warning'});
+		})
+
+		socket.on('reconnect', function(attempt){
+			UIkit.notify('Reestablished server connection!', {status: 'success'});
+			socket.emit('refresh');
+		})
+
+		socket.on('disconnect', function(){
+			UIkit.notify('Disconnected from server', {status: 'warning'});
+		});
+
 		// Hacketi-hack. Letting things settle before requesting refresh.
 		setTimeout(function(){
 			socket.emit('refresh');
