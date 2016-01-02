@@ -60,7 +60,6 @@
 								All scripts must define a variable <q>code</q> holding the class that is used to draw.
 								The class must define <q>onSetup(configuration, dataSource)</q> and
 								<q>onFrame(oldFrame, timePassedInSeconds, frameCallback)</q> methods.
-								The class is instantiated once for each reference in mode definitions.
 								The <q>onSetup</q> method is called when animation starts, followed
 								by repeated calls to <q>onFrame</q>.
 								The configuration parameter is the passed from the display mode json config, and the 
@@ -83,9 +82,8 @@
 				</li>
 				<li>
 					<!-- Setup -->
-					<div class="uk-panel uk-panel-box uk-panel-box-primary ">
-						<h3 class="uk-panel-title">Setup!</h3>
-						Nothing to see here. Go to server and edit the "flipdisc.ini" file.
+					<div class="uk-grid">
+						<setup class="uk-width-1-1"></setup>
 					</div>
 				</li>
 			</ul>
@@ -104,9 +102,10 @@
 	<script src="modeselector.js" type="riot/tag"></script>
 	<script src="modeeditor.js" type="riot/tag"></script>
 	<script src="scripteditor.js" type="riot/tag"></script>
+	<script src="setup.js" type="riot/tag"></script>
 	<script>
 		riot.compile(function() {
-			riot.mount('liveview, modeselector, modeeditor', socket);
+			riot.mount('liveview, modeselector, modeeditor, setup', socket);
 			var scriptEditor = riot.mount('#dsp-scripteditor', {
 				"socket": socket,
 				"title": "Display scripts",
@@ -159,22 +158,27 @@
 			UIkit.notify(message);
 		});
 
-		socket.on('error', function(error){
-			UIkit.notify('Connection problem' + error, {status: 'warning'});
+		function stickyNotify(message){
+			var div = $('#coms-dialog');
+			if(div.length == 0){
+				UIkit.notify('<div id="coms-dialog"></div>', {timeout: 0});
+				div = $('#coms-dialog');
+			}
+			div.html(message);
+		}
+
+		socket.on('disconnect', function(){
+			stickyNotify("<i class='uk-icon-bolt'></i> Disconnected from server");
 		});
 
 		socket.on('reconnecting', function(attempt){
-			UIkit.notify('Reconnecting...' + attempt, {status: 'warning'});
+			stickyNotify("<i class='uk-icon-spin uk-icon-spinner'></i> Reconnecting... " + attempt);
 		})
 
 		socket.on('reconnect', function(attempt){
-			UIkit.notify('Reestablished server connection!', {status: 'success'});
+			stickyNotify("<i class='uk-icon-heartbeat'></i> Reestablished server connection!");
 			socket.emit('refresh');
 		})
-
-		socket.on('disconnect', function(){
-			UIkit.notify('Disconnected from server', {status: 'warning'});
-		});
 
 		// Hacketi-hack. Letting things settle before requesting refresh.
 		setTimeout(function(){

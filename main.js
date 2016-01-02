@@ -7,6 +7,7 @@ var http = require('http');
 var socketio = require('socket.io');
 var diskdb = require('diskdb');
 
+var util = require('./lib/util')
 var FlipDisplay = require('./lib/flipdisplay')
 var State = require('./lib/state')
 var Controller = require('./lib/controller')
@@ -32,7 +33,7 @@ display.open().then(function(){
 	display.clear(0, function(error){
 		console.log("Done clearing, ", error);
 	})
-	controller = new Controller(state, display);
+	controller = new Controller(state, display, config.controller);
 	controller.on('statuschanged', function(status){
 		io.emit('statuschanged', getDisplayStatus());
 	});
@@ -42,6 +43,7 @@ display.open().then(function(){
 })
 
 app.use(express.static(__dirname + '/public'));
+app.use('/db', express.static(__dirname + '/db'));
 
 function getDisplayStatus(){
 	var controllerStatus = controller ? controller.getStatus() : {};
@@ -92,6 +94,9 @@ io.on('connection', function(socket){
 	socket.on('setscript', function(script, callback){
 		console.log('Received script update:', script);
 		try{
+			// Basic test compilation, throws on problems
+			var compiled = util.scriptToObject(script.code, script.name);
+
 			state.setDisplayScript(script);
 			callback(null);
 		}catch(e){
@@ -118,6 +123,9 @@ io.on('connection', function(socket){
 	socket.on('setdatascript', function(script, callback){
 		console.log('Received data script update:', script);
 		try{
+			// Basic test compilation, throws on problems
+			var compiled = util.scriptToObject(script.code, script.name);
+
 			state.setDataFetcher(script);
 			callback(null);
 		}catch(e){
