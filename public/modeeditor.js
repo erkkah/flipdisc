@@ -17,10 +17,9 @@
 					<button class="uk-button uk-button-small" onclick="{onAdd}"><i class="uk-icon-plus"></i></button>
 				</div>
 			</form>
-			<div class="uk-width-1-2">
-				<div class="uk-alert">
-					<h3>Mode: {selectedName}</h3>
-					{selectedDescription}
+			<div class="uk-width-1-2 uk-hidden-small">
+				<div class="uk-panel uk-panel-box uk-panel-box-primary">
+					<yield/>
 				</div>
 			</div>
 		</div>

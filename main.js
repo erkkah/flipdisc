@@ -7,6 +7,7 @@ var http = require('http');
 var socketio = require('socket.io');
 var diskdb = require('diskdb');
 
+var util = require('./lib/util')
 var FlipDisplay = require('./lib/flipdisplay')
 var State = require('./lib/state')
 var Controller = require('./lib/controller')
@@ -24,24 +25,28 @@ var db = diskdb.connect(DBROOT);
 var state = new State(db);
 var display = new FlipDisplay();
 
+var controller = null;
+
 var displayStatus = "Not initialized";
 display.open().then(function(){
 	displayStatus = "Opened";
 	display.clear(0, function(error){
 		console.log("Done clearing, ", error);
 	})
+	controller = new Controller(state, display, config.controller);
+	controller.on('statuschanged', function(status){
+		io.emit('statuschanged', getDisplayStatus());
+	});
 }).catch(function(err){
 	console.log("failed to init display:", err);
 	displayStatus = err + "";
 })
 
-
-
-var controller = new Controller(state, display);
-
 app.use(express.static(__dirname + '/public'));
+app.use('/db', express.static(__dirname + '/db'));
 
-function addDisplayStatus(controllerStatus){
+function getDisplayStatus(){
+	var controllerStatus = controller ? controller.getStatus() : {};
 	controllerStatus.display = displayStatus;
 	return controllerStatus;
 }
@@ -51,7 +56,7 @@ function updateClient(client){
 	client.emit('modeschanged', state.getModes());
 	client.emit('scriptschanged', state.getDisplayScripts());
 	client.emit('datascriptschanged', state.getDataFetchers());
-	client.emit('statuschanged', addDisplayStatus(controller.getStatus()));
+	client.emit('statuschanged', getDisplayStatus());
 }
 
 io.on('connection', function(socket){
@@ -89,6 +94,9 @@ io.on('connection', function(socket){
 	socket.on('setscript', function(script, callback){
 		console.log('Received script update:', script);
 		try{
+			// Basic test compilation, throws on problems
+			var compiled = util.scriptToObject(script.code, script.name);
+
 			state.setDisplayScript(script);
 			callback(null);
 		}catch(e){
@@ -115,6 +123,9 @@ io.on('connection', function(socket){
 	socket.on('setdatascript', function(script, callback){
 		console.log('Received data script update:', script);
 		try{
+			// Basic test compilation, throws on problems
+			var compiled = util.scriptToObject(script.code, script.name);
+
 			state.setDataFetcher(script);
 			callback(null);
 		}catch(e){
@@ -158,10 +169,6 @@ state.on('scriptschanged', function(scripts){
 
 state.on('datafetcherschanged', function(scripts){
 	io.emit('datascriptschanged', scripts);
-});
-
-controller.on('statuschanged', function(status){
-	io.emit('statuschanged', addDisplayStatus(status));
 });
 
 server.listen(PORT, function(){

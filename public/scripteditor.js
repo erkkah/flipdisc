@@ -4,7 +4,7 @@
 			<form class="uk-form uk-form-stacked uk-width-1-2">
 				<legend>{opts.title}</legend>
 				<div class="uk-form-row">
-					<select size=4 class="uk-form-width-medium" id="scriptlist" onchange="{onChange}" disabled={tags.scriptdetails.dirty}>
+					<select size=6 class="uk-form-width-medium" id="scriptlist" onchange="{onChange}" disabled={tags.scriptdetails.dirty}>
 						<option each={scripts} selected={_id == parent.selectedId}>{name}</option>
 					</select>
 					<div class="uk-button-group">
@@ -17,9 +17,9 @@
 					<button class="uk-button uk-button-small" onclick="{onAdd}"><i class="uk-icon-plus"></i></button>
 				</div>
 			</form>
-			<div class="uk-width-1-2">
+			<div class="uk-width-1-2 uk-hidden-small">
 				<div class="uk-panel uk-panel-box uk-panel-box-primary">
-					{opts.info}
+					<yield/>
 				</div>
 			</div>
 		</div>
@@ -98,21 +98,7 @@
 		var scriptName = $('#newscripttext', self.root).val();
 		var newScript = {
 			name: scriptName,
-			code: opts.template || 'code = {\n' + 
-				'	onSetup: function(configuration, dataSource){\n' +
-				'		// set properties of this animation script\n' +
- 				'		// pull data from data source\n' +
- 				'		// set up animation\n' +
- 				'	},\n' +
- 				'	onFrame: function(oldFrame, timePassedInSeconds, frameCallback){\n' +
-				'		// calculate one frame of animation\n' +
-				'		// ...\n' +
-				'		// call frameCallback with updated frame data and ms to next callback\n' +
-				'		// Providing no callback time ends the script.\n' +
-				'		//\n' +
-				'		// frameCallback(updatedFrame, 1000);\n' +
-				' 	}\n' +
-				'};\n'
+			code: opts.template
 		};
 		self.socket.emit(opts.events.set, newScript, function(err){
 			if(err){

@@ -47,16 +47,43 @@
 					</ul>
 
 					<ul class="uk-switcher uk-margin uk-height-1-1" id="script-tabs">
-						<li><modeeditor></modeeditor></li>
-						<li><scripteditor id="dsp-scripteditor"></scripteditor></li>
-						<li><scripteditor id="data-scripteditor"></scripteditor></li>
+						<li>
+							<modeeditor>
+								Each <strong>Display Mode</strong> is a list of display script references.
+								Each display script reference have separate configurations as simple json documents
+								that is used to set up each display script before animation starts.
+							</modeeditor>
+						</li>
+						<li>
+							<scripteditor id="dsp-scripteditor">
+								<strong>Display scripts</strong> do all the dot flipping on the display.<br/>
+								All scripts must define a variable <q>code</q> holding the class that is used to draw.
+								The class must define <q>onSetup(configuration, dataSource)</q> and
+								<q>onFrame(oldFrame, timePassedInSeconds, frameCallback)</q> methods.
+								The <q>onSetup</q> method is called when animation starts, followed
+								by repeated calls to <q>onFrame</q>.
+								The configuration parameter is the passed from the display mode json config, and the 
+								dataSource holds all data defined by data scripts.
+								Calling the provided <q>frameCallback(updatedFrame, milliSecondsToNextFrame)</q>
+								from <q>onFrame</q> updates the display and retriggers another call if
+								milliSecondsToNextFrame is non-zero.
+							</scripteditor>
+						</li>
+						<li>
+							<scripteditor id="data-scripteditor">
+								<strong>Data scripts</strong> define the data that display scripts can use to update the display.
+								All scripts must define a variable <q>code</q> holding the class that is called to generate data.
+								The class must define a method <q>onUpdate</q> that returns the updated data.
+								The data returned is stored in the data source storage using the data script name as a key.
+								The data source storage is passed as the second argument to the display script <q>onSetup</q> method.
+							</scripteditor>
+						</li>
 					</ul>
 				</li>
 				<li>
 					<!-- Setup -->
-					<div class="uk-panel uk-panel-box uk-panel-box-primary ">
-						<h3 class="uk-panel-title">Setup!</h3>
-						Nothing to see here. Go to server and edit the "flipdisc.ini" file.
+					<div class="uk-grid">
+						<setup class="uk-width-1-1"></setup>
 					</div>
 				</li>
 			</ul>
@@ -75,9 +102,10 @@
 	<script src="modeselector.js" type="riot/tag"></script>
 	<script src="modeeditor.js" type="riot/tag"></script>
 	<script src="scripteditor.js" type="riot/tag"></script>
+	<script src="setup.js" type="riot/tag"></script>
 	<script>
 		riot.compile(function() {
-			riot.mount('liveview, modeselector, modeeditor', socket);
+			riot.mount('liveview, modeselector, modeeditor, setup', socket);
 			var scriptEditor = riot.mount('#dsp-scripteditor', {
 				"socket": socket,
 				"title": "Display scripts",
@@ -86,12 +114,21 @@
 					"set": "setscript",
 					"delete": "deletescript"
 				},
-				"info": "Display scripts do all the dot flipping on the display. " + 
-					"Flip flop non stop. " +
-					"All scripts must define a variable 'code' holding the class that is called to draw. " +
-					"The class must define 'onSetup(configuration, dataSource)' and " +
-					"'onFrame(oldFrame, timePassedInSeconds, frameCallback)' methods. " +
-					"The frameCallback is called with (updatedFrame, milliSecondsToNextFrame)."
+				"template": '"use strict";\nvar code = class {\n' + 
+				'	onSetup(configuration, dataSource){\n' +
+				'		// set properties of this animation script\n' +
+ 				'		// pull data from data source\n' +
+ 				'		// set up animation\n' +
+ 				'	}\n' +
+ 				'	onFrame(oldFrame, timePassedInSeconds, frameCallback){\n' +
+				'		// calculate one frame of animation\n' +
+				'		// ...\n' +
+				'		// call frameCallback with updated frame data and ms to next callback\n' +
+				'		// Providing no callback time ends the script.\n' +
+				'		//\n' +
+				'		// frameCallback(updatedFrame, 1000);\n' +
+				' 	}\n' +
+				'};\n'
 			});
 			var dataEditor = riot.mount('#data-scripteditor', {
 				"socket": socket,
@@ -101,10 +138,16 @@
 					"set": "setdatascript",
 					"delete": "deletedatascript"
 				},
-				"template": "var code = {\n};",
-				"info": "Data scripts define the data that display scripts can use to update the display. " +
-				"All scripts must define a variable 'code' holding the class that is called to generate data. " +
-				"The class must define a method 'onUpdate' that returns the updated data."
+				"template": '"use strict";\nvar code = class {\n' + 
+				'	constructor(){\n' +
+				'		// set up stuff\n' +
+ 				'	}\n' +
+ 				'	onUpdate(){\n' +
+				'		// get fresh data\n' +
+				'		// ...\n' +
+				'		// return data object\n' +
+				' 	}\n' +
+				'};\n'
 			});
 
 		});
@@ -114,6 +157,28 @@
 		socket.on('notification', function(message){
 			UIkit.notify(message);
 		});
+
+		function stickyNotify(message){
+			var div = $('#coms-dialog');
+			if(div.length == 0){
+				UIkit.notify('<div id="coms-dialog"></div>', {timeout: 0});
+				div = $('#coms-dialog');
+			}
+			div.html(message);
+		}
+
+		socket.on('disconnect', function(){
+			stickyNotify("<i class='uk-icon-bolt'></i> Disconnected from server");
+		});
+
+		socket.on('reconnecting', function(attempt){
+			stickyNotify("<i class='uk-icon-spin uk-icon-spinner'></i> Reconnecting... " + attempt);
+		})
+
+		socket.on('reconnect', function(attempt){
+			stickyNotify("<i class='uk-icon-heartbeat'></i> Reestablished server connection!");
+			socket.emit('refresh');
+		})
 
 		// Hacketi-hack. Letting things settle before requesting refresh.
 		setTimeout(function(){
