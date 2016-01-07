@@ -1,5 +1,16 @@
 "use strict"
 
+/*
+ * Main script for the flipdisc server.
+ *
+ * Reads settings from "flipdisc.ini", opens a connection to the display
+ * and starts the web admin interface.
+ *
+ * The web interface serves a static one page app using socket.io for event based communication.
+ *
+ * Logs to stdout.
+ */
+
 var fs = require('fs');
 var ini = require('ini');
 var express = require('express');
@@ -42,7 +53,10 @@ display.open().then(function(){
 	displayStatus = err + "";
 })
 
+// Serve admin interface statics from /public
 app.use(express.static(__dirname + '/public'));
+
+// Server database files directly from db storage
 app.use('/db', express.static(__dirname + '/db'));
 
 function getDisplayStatus(){
@@ -51,6 +65,7 @@ function getDisplayStatus(){
 	return controllerStatus;
 }
 
+// Performs a full update of attached web client
 function updateClient(client){
 	client.emit('configchanged', state.getConfig());
 	client.emit('modeschanged', state.getModes());
@@ -59,6 +74,7 @@ function updateClient(client){
 	client.emit('statuschanged', getDisplayStatus());
 }
 
+// For each new connection, attach new event handlers to the socket
 io.on('connection', function(socket){
 
 	socket.on('refresh', function(){
@@ -155,6 +171,7 @@ io.on('connection', function(socket){
 	});
 });
 
+// Hook up event handling for state changes, broadcast to all clients
 state.on('configchanged', function(config){
 	io.emit('configchanged', config);
 });
