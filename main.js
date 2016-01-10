@@ -34,7 +34,11 @@ var io = socketio(server);
 var db = diskdb.connect(DBROOT);
 
 var state = new State(db);
-var display = new FlipDisplay();
+var display = new FlipDisplay({
+	device: config.serial.device,
+	baudRate: config.serial.baudRate,
+	panelLayout: config.display
+});
 
 var controller = null;
 
@@ -76,6 +80,12 @@ function updateClient(client){
 
 // For each new connection, attach new event handlers to the socket
 io.on('connection', function(socket){
+
+	if(controller){
+		controller.on('frame', function(frame){
+			socket.volatile.emit('frame', frame);
+		});
+	}
 
 	socket.on('refresh', function(){
 		console.log('Refreshing client');
