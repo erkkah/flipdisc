@@ -19,6 +19,8 @@ var socketio = require('socket.io');
 var diskdb = require('diskdb');
 
 var util = require('./lib/util')
+var arraypacker = require('./lib/arraypacker')
+
 var FlipDisplay = require('./lib/flipdisplay')
 var State = require('./lib/state')
 var Controller = require('./lib/controller')
@@ -82,8 +84,16 @@ function updateClient(client){
 io.on('connection', function(socket){
 
 	if(controller){
+		let dim = display.getDimensions();
+		let encoder = new arraypacker.Encoder(dim[0], dim[1]);
+
 		controller.on('frame', function(frame){
-			socket.volatile.emit('frame', frame);
+			encoder.encode(frame.getBytes(), function(error, result){
+				if(!error){
+					socket.volatile.emit('frame', result);
+				}
+			})
+			
 		});
 	}
 

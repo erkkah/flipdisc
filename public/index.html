@@ -91,19 +91,20 @@
 	</div>
 
 	<script src="/socket.io/socket.io.js"></script>
-	<script>
-		var socket = io();
-	</script>
+	<script src="bundle.js"/></script>
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.2/ace.js"/></script>
-
 	<script src="https://cdn.jsdelivr.net/riot/2.3/riot+compiler.min.js"></script>
+
 	<script src="liveview.js" type="riot/tag"></script>
 	<script src="modeselector.js" type="riot/tag"></script>
 	<script src="modeeditor.js" type="riot/tag"></script>
 	<script src="scripteditor.js" type="riot/tag"></script>
 	<script src="setup.js" type="riot/tag"></script>
+
 	<script>
+		var socket = io();
+
 		riot.compile(function() {
 			riot.mount('liveview, modeselector, modeeditor, setup', socket);
 			var scriptEditor = riot.mount('#dsp-scripteditor', {
@@ -151,9 +152,7 @@
 			});
 
 		});
-	</script>
 
-	<script>
 		socket.on('notification', function(message){
 			UIkit.notify(message);
 		});

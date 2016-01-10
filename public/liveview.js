@@ -62,9 +62,16 @@
 		self.update();
 	})
 
+	var decoder = new arraypacker.Decoder();
+
 	self.socket.on('frame', function(frame){
-		self.frame = new Uint8Array(frame.buffer);
-		self.update();
+		decoder.decode(frame, function(error, result){
+			if(!error){
+				self.frame = result;
+				self.update();
+			}
+		})
+
 	})
 
 </liveview>
