@@ -29,7 +29,7 @@ var Controller = require('./lib/controller')
 var config = ini.parse(fs.readFileSync(__dirname + '/flipdisc.ini', 'utf-8'));
 
 var PORT = config.http.port || 3000;
-var DBROOT = config.database.root || './db';
+var DBROOT = config.database.root || __dirname + '/db';
 
 var app = express();
 var server = http.Server(app);
@@ -49,7 +49,7 @@ var displayStatus = "Not initialized";
 display.open().then(function(){
 	displayStatus = "Opened";
 	display.clear(0, function(error){
-		console.log("Done clearing, ", error);
+		//console.log("Done clearing, ", error);
 	})
 	controller = new Controller(state, display, config.controller);
 	controller.on('statuschanged', function(status){
@@ -64,11 +64,18 @@ display.open().then(function(){
 app.use(express.static(__dirname + '/public'));
 
 // Server database files directly from db storage
-app.use('/db', express.static(__dirname + '/db'));
+app.use('/db', express.static(config.database.root));
 
 function getDisplayStatus(){
 	var controllerStatus = controller ? controller.getStatus() : {};
 	controllerStatus.display = displayStatus;
+	controllerStatus.fonts = fs.readdirSync(__dirname + '/lib/fonts').
+		filter(function(item){
+			return item.endsWith('.bdf');
+		}).
+		map(function(item){
+			return item.replace('.bdf', '');
+		});
 	return controllerStatus;
 }
 
@@ -84,27 +91,36 @@ function updateClient(client){
 // For each new connection, attach new event handlers to the socket
 io.on('connection', function(socket){
 
+	let frameListener = null;
+
 	if(controller){
 		let encoder = new arraypacker.Encoder();
 
-		controller.on('frame', function(frame){
+		frameListener = function(frame){
 			var result = encoder.encode(frame);
 			socket.volatile.emit('frame', result);
-		});
+		}
+		controller.on('frame', frameListener);
 	}
 
+	socket.on('disconnect', function(){
+		if(controller && frameListener){
+			controller.removeListener('frame', frameListener);
+		}
+	});
+
 	socket.on('refresh', function(){
-		console.log('Refreshing client');
+		//console.log('Refreshing client');
 		updateClient(socket);
 	});
 
 	socket.on('setconfig', function(config){
-		console.log('Received config update');
+		//console.log('Received config update');
 		state.setConfig(config);
 	});
 
 	socket.on('setmode', function(mode, callback){
-		console.log('Received mode update:', mode);
+		//console.log('Received mode update:', mode);
 		try{
 			state.setMode(mode);
 			callback(null);
@@ -115,7 +131,7 @@ io.on('connection', function(socket){
 	});
 
 	socket.on('deletemode', function(modeID){
-		console.log('Received mode deletion');
+		//console.log('Received mode deletion');
 		state.deleteMode(
 			{
 				_id: modeID
@@ -124,7 +140,7 @@ io.on('connection', function(socket){
 	});
 
 	socket.on('setscript', function(script, callback){
-		console.log('Received script update:', script);
+		//console.log('Received script update:', script);
 		try{
 			// Basic test compilation, throws on problems
 			var compiled = util.scriptToObject(script.code, script.name);
@@ -138,7 +154,7 @@ io.on('connection', function(socket){
 	});
 
 	socket.on('deletescript', function(scriptID, callback){
-		console.log('Received script deletion');
+		//console.log('Received script deletion');
 		try{
 			state.deleteDisplayScript(
 				{
@@ -153,7 +169,7 @@ io.on('connection', function(socket){
 	});
 
 	socket.on('setdatascript', function(script, callback){
-		console.log('Received data script update:', script);
+		//console.log('Received data script update:', script);
 		try{
 			// Basic test compilation, throws on problems
 			var compiled = util.scriptToObject(script.code, script.name);
@@ -167,7 +183,7 @@ io.on('connection', function(socket){
 	});
 
 	socket.on('deletedatascript', function(scriptID, callback){
-		console.log('Received data script deletion');
+		//console.log('Received data script deletion');
 		try{
 			state.deleteDataFetcher(
 				{
