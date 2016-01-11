@@ -49,20 +49,20 @@
 					<ul class="uk-switcher uk-margin uk-height-1-1" id="script-tabs">
 						<li>
 							<modeeditor>
-								Each <strong>Display Mode</strong> is a list of display script references.
-								Each display script reference have separate configurations as simple json documents
-								that is used to set up each display script before animation starts.
+								<strong>Display Modes</strong> are lists of display script references.
+								Each display script reference has a simple json configuration
+								that is used to set up the display script before animation starts.
 							</modeeditor>
 						</li>
 						<li>
 							<scripteditor id="dsp-scripteditor">
-								<strong>Display scripts</strong> do all the dot flipping on the display.<br/>
-								All scripts must define a variable <q>code</q> holding the class that is used to draw.
+								<strong>Display scripts</strong> do all the dot flipping.<br/>
+								All scripts must define a variable <q>code</q>, holding the class that is used to draw.
 								The class must define <q>onSetup(configuration, dataSource)</q> and
 								<q>onFrame(oldFrame, timePassedInSeconds, frameCallback)</q> methods.
 								The <q>onSetup</q> method is called when animation starts, followed
 								by repeated calls to <q>onFrame</q>.
-								The configuration parameter is the passed from the display mode json config, and the 
+								The configuration parameter contains the display mode json config, and the 
 								dataSource holds all data defined by data scripts.
 								Calling the provided <q>frameCallback(updatedFrame, milliSecondsToNextFrame)</q>
 								from <q>onFrame</q> updates the display and retriggers another call if
@@ -71,9 +71,9 @@
 						</li>
 						<li>
 							<scripteditor id="data-scripteditor">
-								<strong>Data scripts</strong> define the data that display scripts can use to update the display.
-								All scripts must define a variable <q>code</q> holding the class that is called to generate data.
-								The class must define a method <q>onUpdate</q> that returns the updated data.
+								<strong>Data scripts</strong> define data that display scripts can use to update the display.
+								All scripts must define a variable <q>code</q> holding the class that is used to generate data.
+								The class must define a method <q>onUpdate(callback)</q> that returns the updated data. Alternatively, the provided callback can be called with (error, result) for async operation.
 								The data returned is stored in the data source storage using the data script name as a key.
 								The data source storage is passed as the second argument to the display script <q>onSetup</q> method.
 							</scripteditor>

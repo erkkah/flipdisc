@@ -20,6 +20,7 @@ var diskdb = require('diskdb');
 
 var util = require('./lib/util')
 var arraypacker = require('./lib/arraypacker')
+var dc = require('./lib/debugconsole');
 
 var FlipDisplay = require('./lib/flipdisplay')
 var State = require('./lib/state')
@@ -84,16 +85,11 @@ function updateClient(client){
 io.on('connection', function(socket){
 
 	if(controller){
-		let dim = display.getDimensions();
-		let encoder = new arraypacker.Encoder(dim[0], dim[1]);
+		let encoder = new arraypacker.Encoder();
 
 		controller.on('frame', function(frame){
-			encoder.encode(frame.getBytes(), function(error, result){
-				if(!error){
-					socket.volatile.emit('frame', result);
-				}
-			})
-			
+			var result = encoder.encode(frame);
+			socket.volatile.emit('frame', result);
 		});
 	}
 
@@ -185,6 +181,15 @@ io.on('connection', function(socket){
 		}
 	});
 
+	socket.on('setlogstate', function(logState){
+		if(logState){
+			socket.join("loglisteners");
+		}
+		else{
+			socket.leave("loglisteners");
+		}
+	});
+
 	socket.on('error', function(error){
 		console.log(error);
 		socket.emit('notification', 'Server error: ' + error);
@@ -192,6 +197,7 @@ io.on('connection', function(socket){
 });
 
 // Hook up event handling for state changes, broadcast to all clients
+
 state.on('configchanged', function(config){
 	io.emit('configchanged', config);
 });
@@ -208,7 +214,10 @@ state.on('datafetcherschanged', function(scripts){
 	io.emit('datascriptschanged', scripts);
 });
 
+dc.on('message', function(message){
+	io.to('loglisteners').emit('log', message);
+});
+
 server.listen(PORT, function(){
 	console.log(`listening on *:${PORT}`);
 });
-

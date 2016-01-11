@@ -8,24 +8,33 @@
 			<li>Message: {status.lastMessage}</li>
 		</ul>
 	</div>
-	<div class="uk-panel uk-panel-box">
-		<div class="uk-panel-badge uk-badge">Not Really Live!</div>
+
+	<div class="uk-panel uk-panel-box uk-hidden-small">
 		<h3 class="uk-panel-title">Live view</h3>
-		<canvas id="livedisplay" width={width} height={height}/>
+		<div class="uk-margin"><canvas id="livedisplay" width={width} height={height}/></div>
 	</div>
 
 	var self = this;
 	self.socket = opts;
 
-	var width = 56
-	var height = 14
-	var dotSize = 12
+	var dotSize = 11
 	var border = 10
-	self.width = width * dotSize + border * 2
-	self.height = height * dotSize + border * 2
-	self.frame = new Array(width * height).fill(0);
+
+	function updateDimensions(width, height){
+		if(width != self.displayWidth || height != self.displayHeight){
+			self.displayWidth = width;
+			self.displayHeight = height;
+			self.width = width * dotSize + border * 2
+			self.height = height * dotSize + border * 2
+			self.frame = new Array(width * height).fill(0);
+		}
+	}
+
+	// Set initial dimensions
+	updateDimensions(28, 14);
 
 	self.on('update', function(){
+		// Draw live display
 		var ctx = livedisplay.getContext('2d');
 		ctx.beginPath();
 
@@ -38,9 +47,9 @@
 		var halfDot = dotSize / 2;
 		var radius = halfDot - padding;
 
-		for(var x = 0; x < width; x++){
-			for(var y = 0; y < height; y++){
-				var idx = y * width + x;
+		for(var x = 0; x < self.displayWidth; x++){
+			for(var y = 0; y < self.displayHeight; y++){
+				var idx = y * self.displayWidth + x;
 				var white = self.frame[idx];
 
 				ctx.beginPath();
@@ -62,16 +71,14 @@
 		self.update();
 	})
 
+	// live frames are arraypacked encoded
 	var decoder = new arraypacker.Decoder();
 
 	self.socket.on('frame', function(frame){
-		decoder.decode(frame, function(error, result){
-			if(!error){
-				self.frame = result;
-				self.update();
-			}
-		})
-
+		var result = decoder.decode(frame);
+		updateDimensions(decoder.width, decoder.height);
+		self.frame = result;
+		self.update();
 	})
 
 </liveview>

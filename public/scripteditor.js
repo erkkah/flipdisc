@@ -144,6 +144,7 @@
 			self.editor = ace.edit(code_editor);
 			self.editor.$blockScrolling = Infinity;
 			self.editor.getSession().setMode("ace/mode/javascript");
+			self.editor.getSession().setOption("useWorker", false);
 			self.editor.getSession().on('change', function(e){
 				if(!self.blockDirtyNotifications){
 					self.dirty = true;
