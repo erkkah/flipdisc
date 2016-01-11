@@ -26,7 +26,7 @@
 
 				<span class="uk-panel-title">Script log</span>
 				<button class="uk-button uk-button-small" data-uk-button onchange={onLogChange}><i class="uk-icon-play-circle"></i></button>
-				<p class="uk-form-help-block"><small><i class="uk-icon-info-circle"></i> Showing last 10 entries</small></p>
+				<p class="uk-form-help-block"><small><i class="uk-icon-info-circle"></i> Showing last 10 entries while logging is enabled</small></p>
 				<div class="uk-scrollable-box">
 
 <pre each={logEntries}><b>{timestamp}</b>:

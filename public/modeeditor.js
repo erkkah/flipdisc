@@ -4,11 +4,12 @@
 			<form class="uk-form uk-form-stacked uk-width-1-2">
 				<legend>Display Modes</legend>
 				<div class="uk-form-row">
-					<select size=4 class="uk-form-width-medium" onchange="{onChange}" id="modeslist">
+					<select size=6 class="uk-form-width-medium" onchange="{onChange}" id="modeslist">
 						<option each={modes} selected={_id == parent.selectedId}>{name}</option>
 					</select>
 					<div class="uk-button-group">
 						<button class="uk-button uk-button-small" onclick="{onEdit}" id="editbutton"><i class="uk-icon-edit"></i></button>
+						<button class="uk-button uk-button-small" onclick="{onCopy}" id="copybutton"><i class="uk-icon-copy"></i></button>
 						<button class="uk-button uk-button-small" onclick="{onDelete}" id="deletebutton"><i class="uk-icon-trash"></i></button>
 					</div>
 				</div>
@@ -87,6 +88,20 @@
 			});
 		}
 	}
+
+	onCopy(event){
+		if(self.selectedId){
+			var current = self.findModeById(self.selectedId);
+			var copy = Object.assign({}, current);
+			copy.name += " copy"
+			delete copy._id;
+			self.socket.emit('setmode', copy, function(err){
+				if(err){
+					UIkit.modal.alert('Failed to duplicate mode: ' + err);
+				}
+			});
+		}
+	}	
 
 	onDelete(event){
 		if(self.selectedId){

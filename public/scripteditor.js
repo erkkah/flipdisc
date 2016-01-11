@@ -9,6 +9,7 @@
 					</select>
 					<div class="uk-button-group">
 						<button class="uk-button uk-button-small" onclick="{onEdit}" id="editbutton"><i class="uk-icon-edit"></i></button>
+						<button class="uk-button uk-button-small" onclick="{onCopy}" id="copybutton"><i class="uk-icon-copy"></i></button>
 						<button class="uk-button uk-button-small" onclick="{onDelete}" id="deletebutton"><i class="uk-icon-trash"></i></button>
 					</div>
 				</div>
@@ -77,6 +78,20 @@
 						UIkit.modal.alert('Failed to rename script:' + err);
 					}
 				});
+			});
+		}
+	}
+
+	onCopy(event){
+		if(self.selectedId){
+			var current = self.findScriptById(self.selectedId);
+			var copy = Object.assign({}, current);
+			copy.name += " copy";
+			delete copy._id;
+			self.socket.emit(opts.events.set, copy, function(err){
+				if(err){
+					UIkit.modal.alert('Failed to duplicate script:' + err);
+				}
 			});
 		}
 	}
