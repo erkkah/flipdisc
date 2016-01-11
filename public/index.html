@@ -56,26 +56,67 @@
 						</li>
 						<li>
 							<scripteditor id="dsp-scripteditor">
-								<strong>Display scripts</strong> do all the dot flipping.<br/>
-								All scripts must define a variable <q>code</q>, holding the class that is used to draw.
-								The class must define <q>onSetup(configuration, dataSource)</q> and
-								<q>onFrame(oldFrame, timePassedInSeconds, frameCallback)</q> methods.
-								The <q>onSetup</q> method is called when animation starts, followed
-								by repeated calls to <q>onFrame</q>.
-								The configuration parameter contains the display mode json config, and the 
-								dataSource holds all data defined by data scripts.
-								Calling the provided <q>frameCallback(updatedFrame, milliSecondsToNextFrame)</q>
-								from <q>onFrame</q> updates the display and retriggers another call if
-								milliSecondsToNextFrame is non-zero.
+								<p>
+									<strong>Display scripts</strong> do all the dot flipping.<br/>
+									All scripts must define a variable <q>code</q>, holding the class that is used to draw.
+									The class must define <q>onSetup(configuration, dataSource)</q> and
+									<q>onFrame(oldFrame, timePassedInSeconds, frameCallback)</q> methods.
+									The <q>onSetup</q> method is called when animation starts, followed
+									by repeated calls to <q>onFrame</q>.
+								</p>
+								<div class="uk-hidden" id="displayinfo">
+									<p>
+										The <q>configuration</q> parameter contains the display mode json config, and the 
+										dataSource holds all data defined by data scripts.
+										Calling the provided <q>frameCallback(updatedFrame, milliSecondsToNextFrame)</q>
+										from <q>onFrame</q> updates the display and retriggers another call if
+										milliSecondsToNextFrame is non-zero.
+									</p>
+									<p>
+										The following globals are available to display scripts:
+										<dl>
+											<dt>console</dt><dd>Console that writes to the script log in the "Advanced" tab</dd>
+											<dt>width</dt><dd>Width of the display in dots</dd>
+											<dt>height</dt><dd>Height of the display in dots</dd>
+											<dt>drawText(bmp, x, y, text, font)<dt><dd>Draws text to a MonoBitmap</dd>
+											<dt>getTextBitmap(text, font)</dt><dd>Returns a MonoBitmap containing the complete text</dd>
+										</dl>
+<pre><code>const MonoBitmap = require('./monobitmap');
+var bmp = new MonoBitmap(width, height);
+</code></pre>
+									</p>
+								</div>
+
+								<button class="uk-button uk-button-mini" data-uk-toggle="\{target:'#displayinfo'\}">
+									<i class="uk-icon-ellipsis-h"></i>
+								</button>
+								
 							</scripteditor>
 						</li>
 						<li>
 							<scripteditor id="data-scripteditor">
-								<strong>Data scripts</strong> define data that display scripts can use to update the display.
-								All scripts must define a variable <q>code</q> holding the class that is used to generate data.
-								The class must define a method <q>onUpdate(callback)</q> that returns the updated data. Alternatively, the provided callback can be called with (error, result) for async operation.
-								The data returned is stored in the data source storage using the data script name as a key.
-								The data source storage is passed as the second argument to the display script <q>onSetup</q> method.
+								<p>
+									<strong>Data scripts</strong> define data that display scripts can use to update the display.
+									The data produced is stored in the data source storage using the data script name as a key.
+									The data source storage is then passed as the second argument to the display script <q>onSetup</q> method.
+								</p>
+								<div class="uk-hidden" id="datainfo">
+									<p>
+										All scripts must define a variable <q>code</q> holding the class that is used to generate data.
+										The class must define a method <q>onUpdate(callback)</q> that returns the updated data.
+										Alternatively, the provided callback can be called with (error, result) for easier chaining
+										to async operations.
+									</p>
+									<p>
+										All Node.js core modules are available, as well as the
+										<a href="http://unirest.io/nodejs.html" target="_blank">"unirest"</a>
+										and <a href="http://csv.adaltas.com/parse/" target="_blank">"csv-parse"</a> modules.
+									</p>
+								</div>
+
+								<button class="uk-button uk-button-mini" data-uk-toggle="\{target:'#datainfo'\}">
+									<i class="uk-icon-ellipsis-h"></i>
+								</button>
 							</scripteditor>
 						</li>
 					</ul>
