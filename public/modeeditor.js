@@ -158,6 +158,7 @@
 									</div>
 									<div class="uk-button-group">
 										<button class="uk-button uk-button-small" targetscript={script._id} onclick={onEditConfig} data-uk-modal="\{target:'#config-dialog', bgclose:false\}"><i class="uk-icon-edit"></i></button>
+										<button class="uk-button uk-button-small" onclick={onCopy}><i class="uk-icon-copy"></i></button>
 										<button class="uk-button uk-button-small" onclick={onDelete}><i class="uk-icon-trash"></i></button>
 									</div>
 								</div>
@@ -285,6 +286,14 @@
 		self.dirty = true;
 		self.parent.update();
 		return false;
+	}
+
+	onCopy(e){
+		var current = self.currentScripts[e.item.index];
+		var copy = Object.assign({}, current);
+		self.currentScripts.splice(e.item.index, 0, copy);
+		self.dirty = true;
+		self.parent.update();
 	}
 
 	onDelete(e){
