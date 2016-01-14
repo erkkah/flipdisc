@@ -167,6 +167,13 @@
 					self.parent.update();
 				}
 			});
+			self.editor.commands.addCommand({
+				name: "save",
+				bindKey: {win: "Ctrl-S", mac: "Command-S"},
+				exec: function(editor){
+					self.onSave();
+				}
+			});
 		}catch(er){
 			console.log("Editor init problem:" + er);
 		}
@@ -194,12 +201,14 @@
 			}
 			// Notifications on setters... :|
 			self.blockDirtyNotifications = true;
+			var pos = self.editor.session.selection.toJSON();
 			self.editor.setValue(self.currentScript.code || "", -1);
+			self.editor.session.selection.fromJSON(pos);
 			self.blockDirtyNotifications = false;
 		}
 	});
 
-	onSave(e){
+	onSave(){
 		if(self.dirty){
 			self.currentScript.code = self.editor.getValue();
 			self.socket.emit(opts.events.set, self.currentScript, function(err, result){
