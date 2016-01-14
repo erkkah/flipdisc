@@ -11,7 +11,7 @@
 
 	<div class="uk-panel uk-panel-box uk-hidden-small">
 		<h3 class="uk-panel-title">Live view</h3>
-		<div class="uk-margin"><canvas id="livedisplay" width={width} height={height}/></div>
+		<div class="uk-margin"><canvas name="livedisplay" width={width} height={height}/></div>
 	</div>
 
 	var self = this;
@@ -35,10 +35,10 @@
 
 	self.on('update', function(){
 		// Draw live display
-		var ctx = livedisplay.getContext('2d');
+		var ctx = self.livedisplay.getContext('2d');
 		ctx.beginPath();
 
-		ctx.rect(0, 0, livedisplay.width, livedisplay.height);
+		ctx.rect(0, 0, self.livedisplay.width, self.livedisplay.height);
 		ctx.fillStyle = 'black';
 		ctx.fill();
 		ctx.closePath();

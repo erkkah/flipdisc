@@ -199,12 +199,15 @@
 				// Clone script object to allow local editing
 				Object.assign(self.currentScript, current);
 			}
-			// Notifications on setters... :|
-			self.blockDirtyNotifications = true;
-			var pos = self.editor.session.selection.toJSON();
-			self.editor.setValue(self.currentScript.code || "", -1);
-			self.editor.session.selection.fromJSON(pos);
-			self.blockDirtyNotifications = false;
+
+			if(self.editor){
+				// Notifications on setters... :|
+				self.blockDirtyNotifications = true;
+				var pos = self.editor.session.selection.toJSON();
+				self.editor.setValue(self.currentScript.code || "", -1);
+				self.editor.session.selection.fromJSON(pos);
+				self.blockDirtyNotifications = false;
+			}
 		}
 	});
 

@@ -57,9 +57,9 @@
 		}
 
 		var disabled = self.tags.modedetails.dirty;
-		modeslist.disabled = disabled;
-		deletebutton.disabled = disabled;
-		editbutton.disabled = disabled;
+		self.modeslist.disabled = disabled;
+		self.deletebutton.disabled = disabled;
+		self.editbutton.disabled = disabled;
 	})
 
 	findModeById(wantedId){
@@ -147,9 +147,9 @@
 				<div class="uk-form-row">
 					<label class="uk-form-label" for="form_mode_config">Display scripts</label>
 					<p class="uk-form-help-block"><small><i class="uk-icon-info-circle"></i> Drag to reorder script configurations</small></p>
-					<ul class="uk-sortable uk-grid uk-grid-width-1-1" data-uk-grid-margin data-uk-sortable id="form_mode_config">
+					<ul class="uk-sortable uk-grid uk-grid-width-1-1 uk-grid-small" data-uk-grid-margin data-uk-sortable id="form_mode_config">
 						<li each={script, index in currentScripts} data-order={index + 100}>
-							<div class="uk-panel uk-panel-box">
+							<div class="uk-panel uk-panel-box uk-padding-vertical-remove">
 								<div class="uk-flex uk-flex-space-between">
 									<div class="uk-text-truncate">
 										<i class="uk-sortable-handle uk-icon uk-icon-bars uk-margin-small-right"></i>
@@ -242,7 +242,7 @@
 			self.draggableOrder = 0;
 			self.currentScripts = [];
 			var current = self.parent.findModeById(opts.selected_id);
-			if(current){
+			if(current && self.allScripts.length){
 				self.currentMode = Object.assign({}, current);
 				// Get name from list of all scripts
 				self.currentScripts = self.currentMode.scripts.map(function(scriptReference){
