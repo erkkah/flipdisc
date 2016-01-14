@@ -92,6 +92,7 @@ function updateClient(client){
 io.on('connection', function(socket){
 
 	let frameListener = null;
+	let dataListener = null;
 
 	if(controller){
 		let encoder = new arraypacker.Encoder();
@@ -101,11 +102,19 @@ io.on('connection', function(socket){
 			socket.volatile.emit('frame', result);
 		}
 		controller.on('frame', frameListener);
+
+		dataListener = function(data){
+			socket.volatile.emit('data', data);
+		}
+		controller.on('datachanged', dataListener);
 	}
 
 	socket.on('disconnect', function(){
 		if(controller && frameListener){
 			controller.removeListener('frame', frameListener);
+		}
+		if(controller && dataListener){
+			controller.removeListener('datachanged', dataListener);
 		}
 	});
 

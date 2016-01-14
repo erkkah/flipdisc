@@ -6,15 +6,13 @@
 
 	<title>FlipDisc controller</title>
 
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-
 	<link rel="stylesheet" href="uikit/css/uikit.gradient.css" />
-	<script src="uikit/js/uikit.js"></script>
-
 	<link rel="stylesheet" href="uikit/css/components/sortable.gradient.css" />
-	<script src="uikit/js/components/sortable.js"></script>
-
 	<link rel="stylesheet" href="uikit/css/components/notify.gradient.css" />
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	<script src="uikit/js/uikit.js"></script>
+	<script src="uikit/js/components/sortable.js"></script>
 	<script src="uikit/js/components/notify.js"></script>
 </head>
 <body>
@@ -136,7 +134,7 @@ var bmp = new MonoBitmap(width, height);
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.2/ace.js"/></script>
 	<script src="https://cdn.jsdelivr.net/riot/2.3/riot+compiler.min.js"></script>
-
+	<!--script src="https://cdnjs.cloudflare.com/ajax/libs/riot/2.3.13/riot+compiler.min.js"></script-->
 	<script src="liveview.js" type="riot/tag"></script>
 	<script src="modeselector.js" type="riot/tag"></script>
 	<script src="modeeditor.js" type="riot/tag"></script>
@@ -178,7 +176,8 @@ var bmp = new MonoBitmap(width, height);
 				"events": {
 					"update": "datascriptschanged",
 					"set": "setdatascript",
-					"delete": "deletedatascript"
+					"delete": "deletedatascript",
+					"result": "data"
 				},
 				"template": '"use strict";\nvar code = class {\n' + 
 				'	constructor(){\n' +

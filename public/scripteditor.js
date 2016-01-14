@@ -27,6 +27,7 @@
 	</div>
 
 	<scriptdetails selected_id={selectedId} events={opts.events}></scriptdetails>
+	<scriptresult if={opts.events.result} selected_id={selectedId} events={opts.events}></scriptresult>
 
 	var self = this;
 	self.socket = opts.socket;
@@ -131,7 +132,7 @@
 </scripteditor>
 
 <scriptdetails>
-	<div class="uk-panel uk-panel-box">
+	<div class="uk-panel uk-panel-box uk-margin">
 		<div show={currentScript._id} class="uk-grid">
 			<form class="uk-form uk-form-stacked uk-width-1-1">
 				<legend>{"Code" + (dirty ? " *": "")}</legend>
@@ -224,3 +225,39 @@
 	}
 
 </scriptdetails>
+
+<scriptresult>
+	<div show={currentScript._id}>
+		<div class="uk-panel uk-panel-box uk-margin">
+			<h3 class="uk-panel-title">Result</h3>
+			<div class="uk-scrollable-box">
+			{result || "No result yet"}
+			</div>
+		</div>
+	</div>
+
+	var self = this;
+	self.socket = parent.socket;
+	self.fullResult = {};
+
+	if(opts.events.result){
+		self.socket.on(opts.events.result, function(result){
+			self.fullResult = result;
+			self.update();
+		});
+	}
+
+	self.on('update', function(){
+		var current = self.parent.findScriptById(opts.selected_id);
+		self.currentScript = {};
+		if(current){
+			// Clone script object to allow local editing
+			Object.assign(self.currentScript, current);
+			if(current.name){
+				var resultObject = self.fullResult[current.name];
+				self.result = JSON.stringify(resultObject);
+			}
+
+		}
+	});
+</scriptresult>
