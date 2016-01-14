@@ -1,11 +1,14 @@
 {
   "name": "flipdisc",
   "version": "1.0.0",
-  "description": "Flip disc display experiments",
-  "main": "test.js",
+  "description": "Flip disc display controller",
+  "main": "main.js",
   "dependencies": {
     "array.from": "^0.2.0",
+    "babel-preset-es2015": "^6.3.13",
+    "babelify": "^7.2.0",
     "bdf": "erkkah/BDF.js",
+    "browserify-middleware": "^7.0.0",
     "csv-parse": "^1.0.1",
     "diskdb": "^0.1.14",
     "express": "^4.13.3",
@@ -16,17 +19,20 @@
     "unirest": "^0.4.2"
   },
   "devDependencies": {
-    "browserify": "^13.0.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "doc": "jsdoc -c jsdoc_conf.json -d doc",
-    "build": "browserify index.js -o public/bundle.js",
-    "start": "npm run build && node main"
+    "start": "node main.js"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/erkkah/flipdisc.git"
+  },
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
   },
   "author": "Erik Agsjö",
   "license": "ISC"

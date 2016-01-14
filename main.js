@@ -1,4 +1,6 @@
-"use strict"
+"use strict";
+
+/* eslint-env node, es6 */
 
 /*
  * Main script for the flipdisc server.
@@ -13,18 +15,19 @@
 
 var fs = require('fs');
 var ini = require('ini');
+var browserify = require('browserify-middleware');
 var express = require('express');
 var http = require('http');
 var socketio = require('socket.io');
 var diskdb = require('diskdb');
 
-var util = require('./lib/util')
-var arraypacker = require('./lib/arraypacker')
+var util = require('./lib/util');
+var arraypacker = require('./lib/arraypacker');
 var dc = require('./lib/debugconsole');
 
-var FlipDisplay = require('./lib/flipdisplay')
-var State = require('./lib/state')
-var Controller = require('./lib/controller')
+var FlipDisplay = require('./lib/flipdisplay');
+var State = require('./lib/state');
+var Controller = require('./lib/controller');
 
 var config = ini.parse(fs.readFileSync(__dirname + '/flipdisc.ini', 'utf-8'));
 
@@ -37,6 +40,7 @@ var io = socketio(server);
 var db = diskdb.connect(DBROOT);
 
 var state = new State(db);
+
 var display = new FlipDisplay({
 	device: config.serial.device,
 	baudRate: config.serial.baudRate,
@@ -46,11 +50,12 @@ var display = new FlipDisplay({
 var controller = null;
 
 var displayStatus = "Not initialized";
+
 display.open().then(function(){
 	displayStatus = "Opened";
 	display.clear(0, function(error){
 		//console.log("Done clearing, ", error);
-	})
+	});
 	controller = new Controller(state, display, config.controller);
 	controller.on('statuschanged', function(status){
 		io.emit('statuschanged', getDisplayStatus());
@@ -58,13 +63,16 @@ display.open().then(function(){
 }).catch(function(err){
 	console.log("failed to init display:", err);
 	displayStatus = err + "";
-})
+});
 
 // Serve admin interface statics from /public
 app.use(express.static(__dirname + '/public'));
 
 // Server database files directly from db storage
 app.use('/db', express.static(config.database.root));
+
+// Browserify + babelify main client js
+app.get('/js/bundle.js', browserify(__dirname + '/index.js', {transform: ['babelify']} ));
 
 function getDisplayStatus(){
 	var controllerStatus = controller ? controller.getStatus() : {};
@@ -100,7 +108,7 @@ io.on('connection', function(socket){
 		frameListener = function(frame){
 			var result = encoder.encode(frame);
 			socket.volatile.emit('frame', result);
-		}
+		};
 		controller.on('frame', frameListener);
 
 		dataListener = function(data){
