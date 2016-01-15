@@ -32,7 +32,7 @@ var Controller = require('./lib/controller');
 var config = ini.parse(fs.readFileSync(__dirname + '/flipdisc.ini', 'utf-8'));
 
 var PORT = config.http.port || 3000;
-var DBROOT = config.database.root || __dirname + '/db';
+var DBROOT = config.database.root || __dirname + '/db';
 
 var app = express();
 var server = http.Server(app);
