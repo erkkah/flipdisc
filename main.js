@@ -189,7 +189,7 @@ io.on('connection', function(socket){
 		//console.log('Received data script update:', script);
 		try{
 			// Basic test compilation, throws on problems
-			var compiled = util.scriptToObject(script.code, script.name);
+			var compiled = util.scriptToObject(script.code, script.name, {require: require});
 
 			state.setDataFetcher(script);
 			callback(null);
