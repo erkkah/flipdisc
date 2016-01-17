@@ -59,6 +59,7 @@
 		var disabled = self.tags.modedetails.dirty;
 		self.modeslist.disabled = disabled;
 		self.deletebutton.disabled = disabled;
+		self.copybutton.disabled = disabled;
 		self.editbutton.disabled = disabled;
 	})
 
@@ -213,7 +214,7 @@
 		self.configEditor.$blockScrolling = Infinity;
 		self.configEditor.getSession().setMode("ace/mode/json");
 
-		var sortable = UIkit.sortable(form_mode_config);
+		var sortable = UIkit.sortable(self.form_mode_config);
 		sortable.on('change.uk.sortable', function(event, object, dragged, action){
 			// collect order after dragging
 			var newOrder = [];
@@ -275,7 +276,7 @@
 	}
 
 	onAdd(){
-		var list = allscriptslist;
+		var list = self.allscriptslist;
 		var script = self.allScripts[list.selectedIndex];
 		var newScript = {
 			scriptID: script._id,
@@ -311,7 +312,7 @@
 	}
 
 	onSave(){
-		self.currentMode.description = form_desc.value;
+		self.currentMode.description = self.form_desc.value;
 		self.currentMode.scripts = self.currentScripts;
 		self.socket.emit('setmode', self.currentMode, function(err){
 			if(err){
