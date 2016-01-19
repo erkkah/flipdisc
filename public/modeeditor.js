@@ -215,14 +215,14 @@
 		self.configEditor.getSession().setMode("ace/mode/json");
 
 		var sortable = UIkit.sortable(self.form_mode_config);
-		sortable.on('change.uk.sortable', function(event, object, dragged, action){
+		sortable.on('stop.uk.sortable', function(event, object, dragged, action){
 			// collect order after dragging
 			var newOrder = [];
 			sortable.find('>li').each(function(){
 				var order = $(this).data('order');
 				newOrder.push(order);
 			})
-			
+
 			// build reordered list of scripts
 			var reordered = [];
 			for(var index = 0; index < newOrder.length; index++){
@@ -232,9 +232,22 @@
 				reordered.push(self.currentScripts[newIndex]);
 			}
 
-			self.currentScripts = reordered;
 			self.dirty = true;
-			self.parent.update();
+
+			// Force an update of an empty array first before
+			// updating with the reordered array. This is needed
+			// since Riot is clever and diffs the changed array to
+			// its virtual DOM to figure out what diffs to push to
+			// the real DOM. However, UIKit has already changed the
+			// real DOM, which makes the result really confusing.
+			//
+			// Changing to the empty array forces a complete rebuild
+			// instead of clever diffing, and avoids the problem.
+			// Hacketi-hack..
+			self.currentScripts = [];
+			self.update();
+			self.currentScripts = reordered;
+			self.update();
 		});
 	})
 
