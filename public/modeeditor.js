@@ -247,7 +247,7 @@
 			self.currentScripts = [];
 			self.update();
 			self.currentScripts = reordered;
-			self.update();
+			self.parent.update();
 		});
 	})
 
