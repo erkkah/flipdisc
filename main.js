@@ -160,7 +160,7 @@ io.on('connection', function(socket){
 		//console.log('Received script update:', script);
 		try{
 			// Basic test compilation, throws on problems
-			var compiled = util.scriptToObject(script.code, script.name);
+			var compiled = util.scriptToObject(script.code, script.name, {require: null});
 
 			state.setDisplayScript(script);
 			callback(null);
@@ -189,7 +189,7 @@ io.on('connection', function(socket){
 		//console.log('Received data script update:', script);
 		try{
 			// Basic test compilation, throws on problems
-			var compiled = util.scriptToObject(script.code, script.name, {require: require});
+			var compiled = util.scriptToObject(script.code, script.name);
 
 			state.setDataFetcher(script);
 			callback(null);
