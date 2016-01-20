@@ -33,7 +33,7 @@ var Controller = require('./lib/controller');
 var config = ini.parse(fs.readFileSync(__dirname + '/flipdisc.ini', 'utf-8'));
 
 var PORT = config.http.port || 3000;
-var DBROOT = config.database.root || __dirname + '/db';
+var DBROOT = config.database.root || __dirname + '/db';
 
 var app = express();
 var server = http.Server(app);
@@ -171,7 +171,7 @@ io.on('connection', function(socket){
 		//console.log('Received script update:', script);
 		try{
 			// Basic test compilation, throws on problems
-			var compiled = util.scriptToObject(script.code, script.name);
+			var compiled = util.scriptToObject(script.code, script.name, {require: null});
 
 			state.setDisplayScript(script);
 			callback(null);

@@ -59,6 +59,7 @@
 		var disabled = self.tags.modedetails.dirty;
 		self.modeslist.disabled = disabled;
 		self.deletebutton.disabled = disabled;
+		self.copybutton.disabled = disabled;
 		self.editbutton.disabled = disabled;
 	})
 
@@ -213,15 +214,15 @@
 		self.configEditor.$blockScrolling = Infinity;
 		self.configEditor.getSession().setMode("ace/mode/json");
 
-		var sortable = UIkit.sortable(form_mode_config);
-		sortable.on('change.uk.sortable', function(event, object, dragged, action){
+		var sortable = UIkit.sortable(self.form_mode_config);
+		sortable.on('stop.uk.sortable', function(event, object, dragged, action){
 			// collect order after dragging
 			var newOrder = [];
 			sortable.find('>li').each(function(){
 				var order = $(this).data('order');
 				newOrder.push(order);
 			})
-			
+
 			// build reordered list of scripts
 			var reordered = [];
 			for(var index = 0; index < newOrder.length; index++){
@@ -231,8 +232,21 @@
 				reordered.push(self.currentScripts[newIndex]);
 			}
 
-			self.currentScripts = reordered;
 			self.dirty = true;
+
+			// Force an update of an empty array first before
+			// updating with the reordered array. This is needed
+			// since Riot is clever and diffs the changed array to
+			// its virtual DOM to figure out what diffs to push to
+			// the real DOM. However, UIKit has already changed the
+			// real DOM, which makes the result really confusing.
+			//
+			// Changing to the empty array forces a complete rebuild
+			// instead of clever diffing, and avoids the problem.
+			// Hacketi-hack..
+			self.currentScripts = [];
+			self.update();
+			self.currentScripts = reordered;
 			self.parent.update();
 		});
 	})
@@ -275,7 +289,7 @@
 	}
 
 	onAdd(){
-		var list = allscriptslist;
+		var list = self.allscriptslist;
 		var script = self.allScripts[list.selectedIndex];
 		var newScript = {
 			scriptID: script._id,
@@ -311,7 +325,7 @@
 	}
 
 	onSave(){
-		self.currentMode.description = form_desc.value;
+		self.currentMode.description = self.form_desc.value;
 		self.currentMode.scripts = self.currentScripts;
 		self.socket.emit('setmode', self.currentMode, function(err){
 			if(err){
