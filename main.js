@@ -65,14 +65,18 @@ display.open().then(function(){
 	displayStatus = err + "";
 });
 
+// Serve jsdoc files
+app.use('/doc', express.static(__dirname + '/doc'));
+
 // Serve admin interface statics from /public
 app.use(express.static(__dirname + '/public'));
 
-// Server database files directly from db storage
+// Serve database files directly from db storage
 app.use('/db', express.static(config.database.root));
 
 // Browserify + babelify main client js
 app.get('/js/bundle.js', browserify(__dirname + '/index.js', {transform: ['babelify']} ));
+
 
 function getDisplayStatus(){
 	var controllerStatus = controller ? controller.getStatus() : {};

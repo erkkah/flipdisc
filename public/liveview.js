@@ -71,7 +71,7 @@
 		self.update();
 	})
 
-	// live frames are arraypacked encoded
+	// live frames are arraypacker encoded
 	var decoder = new arraypacker.Decoder();
 
 	self.socket.on('frame', function(frame){

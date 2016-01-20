@@ -6,9 +6,9 @@
 
 	<title>FlipDisc controller</title>
 
-	<link rel="stylesheet" href="uikit/css/uikit.gradient.css" />
-	<link rel="stylesheet" href="uikit/css/components/sortable.gradient.css" />
-	<link rel="stylesheet" href="uikit/css/components/notify.gradient.css" />
+	<link rel="stylesheet" href="/uikit/css/uikit.gradient.css" />
+	<link rel="stylesheet" href="/uikit/css/components/sortable.gradient.css" />
+	<link rel="stylesheet" href="/uikit/css/components/notify.gradient.css" />
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 	<script src="uikit/js/uikit.js"></script>
@@ -22,6 +22,7 @@
 			<li><a href=""><i class="uk-icon-tv"></i> Live</a></li>
 			<li><a href=""><i class="uk-icon-files-o"></i> Scripts</a></li>
 			<li><a href=""><i class="uk-icon-flask"></i> "Advanced"</a></li>
+			<li><a href=""><i class="uk-icon-life-ring"></i> Help</a></li>
 		</ul>
 	</nav>
 	<div data-uk-observe class="uk-container uk-container-center uk-margin-top uk-margin-large-bottom">
@@ -124,6 +125,12 @@
 					<!-- Setup -->
 					<div class="uk-grid">
 						<setup class="uk-width-1-1"></setup>
+					</div>
+				</li>
+				<li class="uk-height-1-1">
+					<!-- Help -->
+					<div class="uk-container uk-height-1-1">
+						<iframe style="display:block; border:none; height:100vh; width:100%;" seamless="seamless" src="/doc/index.html"></iframe>
 					</div>
 				</li>
 			</ul>
