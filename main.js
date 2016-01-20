@@ -16,6 +16,7 @@
 var fs = require('fs');
 var ini = require('ini');
 var browserify = require('browserify-middleware');
+var readme = require('express-middleware-readme.md');
 var express = require('express');
 var http = require('http');
 var socketio = require('socket.io');
@@ -65,6 +66,15 @@ display.open().then(function(){
 	displayStatus = err + "";
 });
 
+
+// Serve README.md as /readme.html
+readme.setOptions({
+	htmlWrap: {
+		styles: '/uikit/css/uikit.gradient.css'
+	}
+});
+app.use(readme.run);
+
 // Serve admin interface statics from /public
 app.use(express.static(__dirname + '/public'));
 
@@ -73,6 +83,7 @@ app.use('/db', express.static(config.database.root));
 
 // Browserify + babelify main client js
 app.get('/js/bundle.js', browserify(__dirname + '/index.js', {transform: ['babelify']} ));
+
 
 function getDisplayStatus(){
 	var controllerStatus = controller ? controller.getStatus() : {};
