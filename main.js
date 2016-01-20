@@ -66,20 +66,14 @@ display.open().then(function(){
 	displayStatus = err + "";
 });
 
-
-// Serve README.md as /readme.html
-readme.setOptions({
-	htmlWrap: {
-		styles: '/uikit/css/uikit.gradient.css'
-	}
-});
-app.use(readme.run);
-
 // Serve admin interface statics from /public
 app.use(express.static(__dirname + '/public'));
 
-// Server database files directly from db storage
+// Serve database files directly from db storage
 app.use('/db', express.static(config.database.root));
+
+// Serve jsdoc files
+app.use('/doc', express.static(__dirname + '/doc'));
 
 // Browserify + babelify main client js
 app.get('/js/bundle.js', browserify(__dirname + '/index.js', {transform: ['babelify']} ));
