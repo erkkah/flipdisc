@@ -31,27 +31,29 @@
 	}
 
 	// Set initial dimensions
-	updateDimensions(28, 14);
+	updateDimensions(1, 1);
+
+	drawDisplayBackground(ctx){
+		ctx.beginPath();
+		ctx.rect(0, 0, self.livedisplay.width, self.livedisplay.height);
+		ctx.fillStyle = 'black';
+		ctx.fill();
+		ctx.closePath();		
+	}
 
 	self.on('update', function(){
 		// Draw live display
 		var ctx = self.livedisplay.getContext('2d');
-		ctx.beginPath();
-
-		ctx.rect(0, 0, self.livedisplay.width, self.livedisplay.height);
-		ctx.fillStyle = 'black';
-		ctx.fill();
-		ctx.closePath();
 
 		var padding = 1;
 		var halfDot = dotSize / 2;
 		var radius = halfDot - padding;
+		self.drawDisplayBackground(ctx);
 
 		for(var x = 0; x < self.displayWidth; x++){
 			for(var y = 0; y < self.displayHeight; y++){
 				var idx = y * self.displayWidth + x;
 				var white = self.frame[idx];
-
 				ctx.beginPath();
 				var arcX = x * dotSize + halfDot + border;
 				var arcY = y * dotSize + halfDot + border;
@@ -75,11 +77,17 @@
 	var arraypacker = require('../lib/arraypacker');
 	var decoder = new arraypacker.Decoder();
 
-	self.socket.on('frame', function(frame){
-		var result = decoder.decode(frame);
-		updateDimensions(decoder.width, decoder.height);
-		self.frame = result;
-		self.update();
+	self.socket.on('frame', function(packed){
+		// Simple optimization, don't redraw equal frames
+		if(!self.lastPacked || self.lastPacked.some(function(item, index){
+			return item != packed[index];
+		})) {
+			self.lastPacked = packed;
+			var result = decoder.decode(packed);
+			updateDimensions(decoder.width, decoder.height);
+			self.frame = result;
+			self.update();
+		}
 	})
 
 </liveview>
