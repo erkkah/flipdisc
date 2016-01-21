@@ -56,7 +56,7 @@ You could for example have one mode that shows secret information at a company, 
 
 The main controller components look roughly like this:
 
-<img src="http://yuml.me/diagram/scruffy/class/[Controller]<-.-notifies[State], [Controller]<>->[Data Fetcher], [Controller]<>->[Animator], [Animator]reads->[Data Source], [Data Fetcher]updates->[Data Source], [Animator]->[Display driver], [note:Runs in a separate process {bg:cornsilk}]-.-[Data Fetcher], [Web Interface]<-.->[State], [Controller]notifies-.->[Web Interface{bg:orange}]"/>
+<img src="http://yuml.me/diagram/scruffy/class/[Controller]<-.-notifies[State], [Controller]<&gt;-&gt;[Data Fetcher], [Controller]<&gt;-&gt;[Animator], [Animator]reads-&gt;[Data Source], [Data Fetcher]updates-&gt;[Data Source], [Animator]-&gt;[Display driver], [note:Runs in a separate process {bg:cornsilk}]-.-[Data Fetcher], [Web Interface]<-.-&gt;[State], [Controller]notifies-.-&gt;[Web Interface{bg:orange}]"/>
 
 
 The complete setup of modes, data fetchers, et.c. is stored in the central State and backed on disk.
