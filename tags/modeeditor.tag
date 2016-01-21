@@ -210,7 +210,7 @@
 	});
 
 	self.on('mount', function(){
-		self.configEditor = ace.edit("config-editor");
+		self.configEditor = window.ace.edit("config-editor");
 		self.configEditor.$blockScrolling = Infinity;
 		self.configEditor.getSession().setMode("ace/mode/json");
 

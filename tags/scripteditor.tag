@@ -157,7 +157,7 @@
 	self.on('mount', function(){
 		try{
 			var code_editor = $('#code_editor', self.root).get(0);
-			self.editor = ace.edit(code_editor);
+			self.editor = window.ace.edit(code_editor);
 			self.editor.$blockScrolling = Infinity;
 			self.editor.getSession().setMode("ace/mode/javascript");
 			self.editor.getSession().setOption("useWorker", false);
