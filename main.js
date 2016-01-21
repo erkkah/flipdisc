@@ -74,6 +74,9 @@ app.use(express.static(__dirname + '/public'));
 // Serve database files directly from db storage
 app.use('/db', express.static(config.database.root));
 
+// Force deployment mode to investigate performance problems
+browserify.settings.mode = 'deployment';
+
 // Browserify + babelify main client js
 app.get('/js/bundle.js', browserify(__dirname + '/index.js', {transform: ['babelify']} ));
 
