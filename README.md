@@ -62,7 +62,7 @@ The main controller components look roughly like this:
 The complete setup of modes, data fetchers, et.c. is stored in the central State and backed on disk.
 The data pulled from online sources (or created from scratch) for later display is stored in the "Data Source".
 
-Both the Animator and the Data Fetcher are configured by writing small scripts in ES6:ish Javascript (Node 4.x)
+Both the Animator and the Data Fetcher are configured/programmed by writing small scripts in ES6:ish Javascript (Node 4.x)
 using the web interface.
 
 #### Modes
@@ -80,14 +80,16 @@ being shown on the display, as a transition of other effect.
 ##### Writing Display Scripts
 Display scripts must define a global variable `code` that contains the class implementation.
 The class must define the methods `onSetup(configuration, dataSource)` and
-`onFrame(oldFrame, timePassedInSeconds, frameCallback)`. The `frameCallback` must be called
-with `frameCallback(newFrame, timeToNextFrameMS)`. If `timeToNextFrameMS` is falsy, the animator
-will move on to the next script in the mode list.
+`onFrame(oldFrame, timePassedInSeconds, frameCallback)`. The `onSetup` method is called each
+time the animator reaches a Display Script in the mode list, to prepare for an animation
+sequence. After that, the `onFrame` method is called repeatedly to update the display.
+The `frameCallback` must be called with `frameCallback(newFrame, timeToNextFrameMS)`.
+If `timeToNextFrameMS` is falsy, the animator will move on to the next script in the mode list.
 
-*NOTE: Not calling the `frameCallback` halts the animation.*
+*NOTE: Not calling `frameCallback` at all halts the animation.*
 
 Example:
-```
+```javascript
 var code = class{
 	constructor(){
 	}
@@ -109,7 +111,7 @@ var code = class{
 The frames must be MonoBitmap instances.
 
 Example MonoBitmap usage:
-```
+```javascript
 var bmp = new MonoBitmap(width, height);
 bmp.fill(0).drawLine(0, 0, width - 1, height - 1);
 bmp.putPixel(3, 3, 1);
@@ -150,18 +152,35 @@ later to store a result.
 Using both patterns (both returning and calling the callback) yields unpredictable results
 and will cause a warning.
 
-Example:
-```
+Sync example:
+```javascript
 var code = class {
 	constructor() {
-
+		this.msg = "Hejsan";
 	}
 
 	onUpdate(callback) {
-		return "Hejsan";
+		return this.msg;
 	}
 };
 ```
+
+Async example:
+```javascript
+var code = class {
+	constructor() {
+	}
+
+	onUpdate(callback) {
+		someAsyncOperation(function(error, result){
+			callback(error, result);
+		});
+	}
+};
+```
+
+You can also start an updater timer using `setTimeout` in the constructor and then
+providing sync data access using `onUpdate`.
 
 *NOTE: The Data Fetcher running the Data Scripts runs in a separate process. All data returned
 by Data Scripts is serialized to JSON and back before being put into the Data Source.*
