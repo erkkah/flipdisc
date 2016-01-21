@@ -72,6 +72,7 @@
 	})
 
 	// live frames are arraypacker encoded
+	var arraypacker = require('../lib/arraypacker');
 	var decoder = new arraypacker.Decoder();
 
 	self.socket.on('frame', function(frame){
