@@ -74,11 +74,15 @@ app.use(express.static(__dirname + '/public'));
 // Serve database files directly from db storage
 app.use('/db', express.static(config.database.root));
 
-// Force deployment mode to investigate performance problems
-browserify.settings.mode = 'deployment';
+// Force production settings
+browserify.settings.mode = 'production';
 
 // Browserify + babelify + riotify main client js
-app.get('/js/bundle.js', browserify(__dirname + '/index.js', {transform: ['riotify', 'babelify']} ));
+app.get('/js/bundle.js', browserify(__dirname + '/index.js', {
+	transform: ['riotify', 'babelify'],
+	cache: config.http.cache || '1 day',
+	precompile: true
+} ));
 
 function getDisplayStatus(){
 	var controllerStatus = controller ? controller.getStatus() : {};
