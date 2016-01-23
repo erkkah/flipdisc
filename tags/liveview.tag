@@ -41,7 +41,8 @@
 		ctx.closePath();		
 	}
 
-	self.on('update', function(){
+	// Draw _after_ ('updated') tag is updated and the canvas is reallocated
+	self.on('updated', function(){
 		// Draw live display
 		var ctx = self.livedisplay.getContext('2d');
 
