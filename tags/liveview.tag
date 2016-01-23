@@ -38,34 +38,43 @@
 		ctx.rect(0, 0, self.livedisplay.width, self.livedisplay.height);
 		ctx.fillStyle = 'black';
 		ctx.fill();
-		ctx.closePath();		
+		ctx.closePath();
 	}
 
-	self.on('update', function(){
+	drawDisplay() {
 		// Draw live display
 		var ctx = self.livedisplay.getContext('2d');
 
 		var padding = 1;
 		var halfDot = dotSize / 2;
 		var radius = halfDot - padding;
+
 		self.drawDisplayBackground(ctx);
+
+		ctx.lineWidth = 0.2;
+		ctx.strokeStyle = "#888888";
 
 		for(var x = 0; x < self.displayWidth; x++){
 			for(var y = 0; y < self.displayHeight; y++){
 				var idx = y * self.displayWidth + x;
 				var white = self.frame[idx];
+
 				ctx.beginPath();
 				var arcX = x * dotSize + halfDot + border;
 				var arcY = y * dotSize + halfDot + border;
 				ctx.arc(arcX, arcY, radius, 0, 2 * Math.PI, false);
 				ctx.fillStyle = white ? 'white' : '#111111';
 				ctx.fill();
-				ctx.lineWidth = 0.2;
-				ctx.strokeStyle = "#888888";
 				ctx.stroke();
 				ctx.closePath();
 			}
-		}
+		}		
+	}
+
+	// Draw _after_ ('updated') tag is updated and the canvas is reallocated
+	self.on('updated', function(){
+		//self.drawDisplay();
+		window.requestAnimationFrame(self.drawDisplay);
 	});
 
 	self.socket.on('statuschanged', function(status){
