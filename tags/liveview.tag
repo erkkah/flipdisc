@@ -27,6 +27,7 @@
 			self.width = width * dotSize + border * 2
 			self.height = height * dotSize + border * 2
 			self.frame = new Array(width * height).fill(0);
+			self.update();
 		}
 	}
 
@@ -49,6 +50,8 @@
 		var halfDot = dotSize / 2;
 		var radius = halfDot - padding;
 
+		ctx.clearRect(0, 0, self.livedisplay.width, self.livedisplay.height);
+
 		self.drawDisplayBackground(ctx);
 
 		ctx.lineWidth = 0.2;
@@ -68,13 +71,19 @@
 				ctx.stroke();
 				ctx.closePath();
 			}
-		}		
+		}
+	}
+
+	function requestRedraw(){
+		if(!document.hidden){
+			//self.drawDisplay();
+			window.requestAnimationFrame(self.drawDisplay);
+		}
 	}
 
 	// Draw _after_ ('updated') tag is updated and the canvas is reallocated
 	self.on('updated', function(){
-		//self.drawDisplay();
-		window.requestAnimationFrame(self.drawDisplay);
+		requestRedraw();
 	});
 
 	self.socket.on('statuschanged', function(status){
@@ -95,7 +104,7 @@
 			var result = decoder.decode(packed);
 			updateDimensions(decoder.width, decoder.height);
 			self.frame = result;
-			self.update();
+			requestRedraw();
 		}
 	})
 
