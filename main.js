@@ -17,6 +17,7 @@ var fs = require('fs');
 var ini = require('ini');
 var browserify = require('browserify-middleware');
 var express = require('express');
+var basicAuth = require('express-basic-auth')
 var http = require('http');
 var socketio = require('socket.io');
 var diskdb = require('diskdb');
@@ -64,6 +65,15 @@ display.open().then(function(){
 	console.log("failed to init display:", err);
 	displayStatus = err + "";
 });
+
+if(config.auth && config.auth.pass) {
+    // Basic auth
+    app.use(basicAuth({
+        users: { 'admin': config.auth.pass },
+        challenge: true,
+        realm: 'the woods'
+    }));
+}
 
 // Serve jsdoc files
 app.use('/doc', express.static(__dirname + '/doc'));
