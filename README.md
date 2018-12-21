@@ -15,10 +15,8 @@ a simple file based json database.
 
 ## Prerequisites
 
-The only prerequisite in addition to the hardware is a working Node.js version 4.x installation with
-the ability to build native modules. The controller was designed to run on the Raspberry Pi,
-a verified setup is a plain Raspbian jessie lite image (2015-11-21) with the
-[Nodesource](https://deb.nodesource.com) 4.x Debian distro.
+The only prerequisite in addition to the hardware is a recent (8+) Node.js installation with
+the ability to build native modules. (Version v1.0 should still run on Node.js 4.x.)
 
 The web interface is developed on Chrome, but should work on other sane modern browsers.
 
