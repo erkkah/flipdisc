@@ -6,19 +6,20 @@
 
 	<title>FlipDisc controller</title>
 
-	<link rel="stylesheet" href="/uikit/css/uikit.gradient.css" />
-	<link rel="stylesheet" href="/uikit/css/components/sortable.gradient.css" />
-	<link rel="stylesheet" href="/uikit/css/components/notify.gradient.css" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/2.27.5/css/uikit.gradient.css" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/2.27.5/css/components/sortable.gradient.min.css" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/2.27.5/css/components/notify.gradient.css" />
 
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-	<script src="uikit/js/uikit.js"></script>
-	<script src="uikit/js/components/sortable.js"></script>
-	<script src="uikit/js/components/notify.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/2.27.5/js/uikit.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/2.27.5/js/components/sortable.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/2.27.5/js/components/notify.js"></script>
+
 </head>
 <body>
 	<nav class="uk-navbar">
 		<a href="" class="uk-navbar-brand">FlipDisc</a>
-		<ul class="uk-navbar-nav" data-uk-switcher="{connect:'#display_views'}">
+		<ul class="uk-navbar-nav" data-uk-switcher="{connect:'#display_views', swiping:false}">
 			<li><a href=""><i class="uk-icon-tv"></i> Live</a></li>
 			<li><a href=""><i class="uk-icon-files-o"></i> Scripts</a></li>
 			<li><a href=""><i class="uk-icon-flask"></i> "Advanced"</a></li>
@@ -27,7 +28,7 @@
 	</nav>
 	<div data-uk-observe class="uk-container uk-container-center uk-margin-top uk-margin-large-bottom">
 		<div>
-			<ul id="display_views" class="uk-switcher uk-margin">
+			<ul id="display_views" class="uk-margin uk-switcher">
 				<li>
 					<!-- Live -->
 					<div class="uk-grid">
@@ -36,10 +37,13 @@
 					<div class="uk-grid">
 						<modeselector class="uk-width-1-1"></modeselector>
 					</div>
+					<div class="uk-grid">
+						<statusview class="uk-width-1-1"></statusview>
+					</div>
 				</li>
 				<li>
 					<!-- Scripts -->
-					<ul class="uk-tab" data-uk-tab="{connect:'#script-tabs'}">
+					<ul class="uk-tab" data-uk-tab="{connect:'#script-tabs', swiping:false}">
 						<li class="uk-active"><a href="">Modes</a></li>
 						<li><a href="">Display scripts</a></li>
 						<li><a href="">Data scripts</a></li>
@@ -142,16 +146,8 @@
 		var socket = io();
 	</script>
 
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.2/ace.js"/></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.2/ace.js"/></script>
 	<script src="/js/bundle.js"/></script>
-	<!--
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/riot/2.3.13/riot+compiler.min.js"></script>
-	<script src="liveview.js" type="riot/tag"></script>
-	<script src="modeselector.js" type="riot/tag"></script>
-	<script src="modeeditor.js" type="riot/tag"></script>
-	<script src="scripteditor.js" type="riot/tag"></script>
-	<script src="setup.js" type="riot/tag"></script>
-	-->
 
 	<script>
 		socket.on('notification', function(message){
