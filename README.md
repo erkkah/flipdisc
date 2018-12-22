@@ -1,7 +1,9 @@
 # flipdisc
 
-Node.js based controller for an [Alfa Zeta](http://www.flipdots.com) Flip Disc (disc, dot..) display.
-A display is made out of 14x28 dot XY panels put together in a rectangular shape. The display panels
+<img src="./preview.png"/>
+
+A Node.js based controller for an [Alfa Zeta](http://www.flipdots.com) Flip Disc (disc, dot..) display.
+These displays are made out of 14x28 dot XY panels put together in a rectangular shape. The display panels
 are connected to a RS485 bus which is connected via a serial interface as accessed by the
 [serialport](https://www.npmjs.com/package/serialport) library. Only the two controller panel version
 is supported, where each 14x28 unit is driven by two separately addressable controllers, driving
@@ -10,7 +12,7 @@ is supported, where each 14x28 unit is driven by two separately addressable cont
 The controller fetches data from online resources and shows the data on the display using different
 display scripts that perform basic animations and effects.
 
-There is a web interface used to setup and program the controller. Configuration data is stored in
+There is a web interface used to setup and program the controller. The web interface has a preview function, to enable test and development without having access to a physical display. Configuration data is stored in
 a simple file based json database.
 
 ## Prerequisites
@@ -35,6 +37,7 @@ and go to the web interface.
 OK, so a bit more details might be needed.
 
 ### flipdisc.ini
+
 The `flipdisc.ini` config file sets up the basics to get up and running:
 
 * Web interface port
@@ -60,7 +63,7 @@ The main controller components look roughly like this:
 The complete setup of modes, data fetchers, et.c. is stored in the central State and backed on disk.
 The data pulled from online sources (or created from scratch) for later display is stored in the "Data Source".
 
-Both the Animator and the Data Fetcher are configured/programmed by writing small scripts in ES6:ish Javascript (Node 4.x)
+Both the Animator and the Data Fetcher are configured/programmed by writing small scripts in ES6:ish Javascript
 using the web interface.
 
 #### Modes
@@ -78,13 +81,12 @@ being shown on the display, as a transition of other effect.
 ##### Writing Display Scripts
 Display scripts must define a global variable `code` that contains the class implementation.
 The class must define the methods `onSetup(configuration, dataSource)` and
-`onFrame(oldFrame, timePassedInSeconds, frameCallback)`. The `onSetup` method is called each
+`onFrame(oldFrame, timePassedInSeconds)`. The `onSetup` method is called each
 time the animator reaches a Display Script in the mode list, to prepare for an animation
 sequence. After that, the `onFrame` method is called repeatedly to update the display.
-The `frameCallback` must be called with `frameCallback(newFrame, timeToNextFrameMS)`.
-If `timeToNextFrameMS` is falsy, the animator will move on to the next script in the mode list.
-
-*NOTE: Not calling `frameCallback` at all halts the animation.*
+To update the display, modify the bitmap passed in `oldFrame`. Return the milliseconds
+to the next call to `onFrame`. Returning zero will tell the animator to move on to the
+next script in the mode list.
 
 Example:
 ```javascript
@@ -93,15 +95,13 @@ var code = class{
 	}
 
 	onSetup(configuration, dataSource){
-		var color = configuration.color || 0;
-
-		this.bmp = new MonoBitmap(width, height);
-		this.bmp.fill(color);
+		this-color = configuration.color || 0;
 	}
 
-	onFrame(oldFrame, timePassedInSeconds, frameCallback){
+	onFrame(oldFrame, timePassedInSeconds){
 		// Just draw one frame
-		frameCallback(this.bmp, 0);
+		oldFrame.fill(this.color);
+		return 0;
 	}
 };
 ```

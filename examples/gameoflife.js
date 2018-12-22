@@ -64,18 +64,16 @@ var code = class {
 			this.endRepetitions--
 		}
 
+		inFrame.drawBitmap(outFrame, 0, 0);
 		var timeToStop = this.endRepetitions <= 0
-		if (timeToStop) {
-			frameCallback(outFrame, 0);
-		}
-		else {
-			frameCallback(outFrame, 200);
-		}
+		var timeToNext = timeToStop ? 0 : 200;
 
 		// Keep the last 20 iterations
 		this.oldFrames.push(outFrame)
 		if (this.oldFrames.length > 20) {
 			this.oldFrames.shift()
 		}
+
+		return timeToNext;
  	}
 };

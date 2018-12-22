@@ -39,13 +39,14 @@ var code = class {
 		// set up animation
 	}
 
-	onFrame(oldFrame, timePassedInSeconds, frameCallback){
-		// calculate one frame of animation
-		// ...
-		// call frameCallback with updated frame data and ms to next callback
-		// Providing no callback time ends the script.
+	onFrame(oldFrame, timePassedInSeconds){
+		// calculate one frame of animation,
+		// update oldFrame
+		// and return ms to next callback.
+		// Return 0 to end the script.
 		//
-		// frameCallback(updatedFrame, 1000);
+		// oldFrame.fill(0);
+		// return 1000;
 	}
 };
 `
