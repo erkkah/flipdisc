@@ -8,6 +8,7 @@ require('babel-polyfill');
 // Riot + tags
 var riot = require('riot');
 var liveview = require('./tags/liveview.tag');
+var statusview = require('./tags/statusview.tag');
 var modeselector = require('./tags/modeselector.tag');
 var modeeditor = require('./tags/modeeditor.tag');
 var scripteditor = require('./tags/scripteditor.tag');
@@ -18,7 +19,7 @@ var socket = window.socket;
 
 // Mount all tags..
 
-riot.mount('liveview, modeselector, modeeditor, setup', socket);
+riot.mount('liveview, statusview, modeselector, modeeditor, setup', socket);
 
 riot.mount('#dsp-scripteditor', {
 	"socket": socket,
