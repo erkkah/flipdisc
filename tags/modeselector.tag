@@ -9,7 +9,6 @@
 			<div if={modes.length == 0} class="uk-panel uk-panel-box">
 			<small>No modes defined</small>
 			</div>
-			<button class="uk-button uk-float-right" disabled={modes.length == 0}>OK</button>
 		</fieldset></form>
 	</div>
 
@@ -30,10 +29,7 @@
 
 	onChange(e){
 		self.config.selectedMode = e.currentTarget.id;
+		socket.emit('setconfig', self.config);
 	}
 
-	onSubmit(e){
-		socket.emit('setconfig', self.config);
-		return false;
-	}
 </modeselector>

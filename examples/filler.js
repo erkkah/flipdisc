@@ -10,14 +10,13 @@
 
 var code = class {
 	onSetup(configuration, dataSource){
-		var bmp = new MonoBitmap(width, height);
-		var color = configuration.color;
-		bmp.fill(color);
-		this.bmp = bmp;
+		this.color = configuration.color;
+
 	}
 	
 	onFrame(oldFrame, timePassedInSeconds, frameCallback){
 		// Just fill and return
-		frameCallback(this.bmp, 0);
+		oldFrame.fill(this.color);
+		return 0;
 	}
 };

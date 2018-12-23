@@ -1,7 +1,7 @@
 "use strict";
 
 /**
- * Clears the display, draws a nonanimated text.
+ * Example display script that draws nonanimated text.
  * Text is either fetched from data source based on
  * the 'reference' config parameter, or fetched from
  * the 'text' config parameter.
@@ -19,26 +19,21 @@
 
 var code = class {
 	onSetup(configuration, dataSource){
-		var text;
-		
 		if(configuration.reference){
-			text = dataSource.resolve(configuration.reference) + "";
+			this.text = dataSource.resolve(configuration.reference) + "";
 		}
-		if(!text){
-			text = configuration.text || "Hello?";
+		if(!this.text){
+			this.text = configuration.text || "Hello?";
 		}
-		var font = configuration.font || "5x7";
-		var offset = configuration.offset || [0, 0];
-		var x = offset[0] || 0;
-		var y = offset[1] || 0;
-		
-		this.bmp = new MonoBitmap(width, height);
-		this.bmp.fill(0);
-		drawText(this.bmp, x, y, text, font);
+		this.font = configuration.font || "5x7";
+		this.offset = configuration.offset || [0, 0];
 	}
 	
-	onFrame(oldFrame, timePassedInSeconds, frameCallback){
-		// Just draw and return
-		frameCallback(this.bmp, 0);
+	onFrame(oldFrame, timePassedInSeconds){
+		var x = this.offset[0] || 0;
+		var y = this.offset[1] || 0;
+		
+		drawText(oldFrame, x, y, this.text, this.font);
+		return 0;
 	}
 };
