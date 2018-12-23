@@ -1,15 +1,5 @@
 <liveview>
 	<div class="uk-panel uk-panel-box">
-		<h3 class="uk-panel-title">Status</h3>
-		<ul>
-			<li>Display: {status.display}</li>
-			<li>Data fetcher: {status.dataFetcher ? "Running": "Stopped"}</li>
-			<li>Animator: {status.animator ? "Running": "Stopped"}</li>
-			<li>Message: {status.lastMessage}</li>
-		</ul>
-	</div>
-
-	<div class="uk-panel uk-panel-box uk-hidden-small">
 		<h3 class="uk-panel-title">Live view</h3>
 		<div class="uk-margin">
 			<canvas if={useCanvas} name="livedisplay" width={width} height={height}/>
@@ -172,11 +162,6 @@
 		setupDisplay();
 		requestRedraw();
 	});
-
-	self.socket.on('statuschanged', function(status){
-		self.status = status;
-		self.update();
-	})
 
 	// live frames are arraypacker encoded
 	var arraypacker = require('../lib/arraypacker');

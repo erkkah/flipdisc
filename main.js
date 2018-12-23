@@ -75,6 +75,12 @@ if(config.auth && config.auth.pass) {
     }));
 }
 
+app.use(function(req, res, next) {
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	next();
+});
+
 // Serve jsdoc files
 app.use('/doc', express.static(__dirname + '/doc'));
 

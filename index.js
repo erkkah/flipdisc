@@ -8,6 +8,7 @@ require('babel-polyfill');
 // Riot + tags
 var riot = require('riot');
 var liveview = require('./tags/liveview.tag');
+var statusview = require('./tags/statusview.tag');
 var modeselector = require('./tags/modeselector.tag');
 var modeeditor = require('./tags/modeeditor.tag');
 var scripteditor = require('./tags/scripteditor.tag');
@@ -18,7 +19,7 @@ var socket = window.socket;
 
 // Mount all tags..
 
-riot.mount('liveview, modeselector, modeeditor, setup', socket);
+riot.mount('liveview, statusview, modeselector, modeeditor, setup', socket);
 
 riot.mount('#dsp-scripteditor', {
 	"socket": socket,
@@ -38,13 +39,14 @@ var code = class {
 		// set up animation
 	}
 
-	onFrame(oldFrame, timePassedInSeconds, frameCallback){
-		// calculate one frame of animation
-		// ...
-		// call frameCallback with updated frame data and ms to next callback
-		// Providing no callback time ends the script.
+	onFrame(oldFrame, timePassedInSeconds){
+		// calculate one frame of animation,
+		// update oldFrame
+		// and return ms to next callback.
+		// Return 0 to end the script.
 		//
-		// frameCallback(updatedFrame, 1000);
+		// oldFrame.fill(0);
+		// return 1000;
 	}
 };
 `

@@ -1,5 +1,9 @@
 "use strict";
 
+/*
+ * Example data fetcher script that loads an image from a URL.
+ */
+
 const jimp = require('jimp');
 const Dither = require('image-dither');
 const assert = require('assert');
