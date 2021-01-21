@@ -20,7 +20,7 @@
     "riot": "^2.6.9",
     "riotify": "^2.0.0",
     "serialport": "^7.0.2",
-    "socket.io": "^2.1.1"
+    "socket.io": "^2.4.0"
   },
   "devDependencies": {
     "jsdoc": "^3.6.6"
